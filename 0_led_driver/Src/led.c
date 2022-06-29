@@ -1,28 +1,35 @@
+/**
+ * @file led.c
+ * @author your name (jonathan.cagua@gmail.com)
+ * @brief Test con el portb y pin 14
+ * @version 0.1
+ * @date 2022-06-29
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include "led.h"
 
-#define PIN				14U
-#define MODE_REG		2U
-#define GPIOBEN			(1U<<1)//  0b 0000 0000 0000 0000 0000 0000 0000 0001
-#define LED_PIN			(1U<<PIN)
+#define PIN				14U			//se selcciona el pin
+#define MODE_REG		2U			//para usar con el registro de set
+#define GPIOBEN			(1U<<1)		//para activar el port b
+#define LED_PIN			(1U<<PIN)	//se desplaza para selccion el pin
 
 void led_init(void)
 {
-	/*Enable clock access to led port (Port b)*/
+	// Se habilita el acceso al port b con el clock
 	RCC->AHB2ENR  |= GPIOBEN;
-
-	/*Set led pin as output pin*/
+	// Se setea el pin como salida
 	GPIOB->MODER |=(1U<<(PIN*MODE_REG));
 	GPIOB->MODER &= ~(1U<<((PIN*MODE_REG)+1));
 }
 
 void led_on(void)
 {
-	//set led pin en high (GPIOB 14)
 	GPIOB->ODR |= LED_PIN;
 }
 
 void led_off(void)
 {
-	//set led pin en low (GPIOB 14)
 	GPIOB->ODR &= ~LED_PIN;
 }

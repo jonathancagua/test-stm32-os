@@ -4,3 +4,9 @@ STM32Cube_FW_L4_V1.17.0/
 0_led_driver/chip_headers/CMSIS/RTOS
 0_led_driver/chip_headers/CMSIS/RTOS2
 0_led_driver/chip_headers/CMSIS/docs
+*.o
+*.su
+*.d
+*.elf
+*.map
+*.list
