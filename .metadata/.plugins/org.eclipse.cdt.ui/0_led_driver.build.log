@@ -1,0 +1,9 @@
+07:40:28 **** Clean-only build of configuration Debug for project 0_led_driver ****
+make -j8 clean 
+rm -rf ./Startup/startup_stm32l475vgtx.d ./Startup/startup_stm32l475vgtx.o
+rm -rf ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su
+rm -rf 0_led_driver.elf 0_led_driver.list 0_led_driver.map default.size.stdout
+ 
+
+07:40:28 Build Finished. 0 errors, 0 warnings. (took 466ms)
+

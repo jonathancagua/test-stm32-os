@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;0_led_driver&apos;" deleteContents="true" description="Delete resource &apos;0_led_driver&apos;" element1="/0_led_driver" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1656421899788"/>&#x0A;<refactoring comment="Delete resource &apos;0_led_driver/Src/LED.C&apos;" deleteContents="false" description="Delete resource &apos;0_led_driver/Src/LED.C&apos;" element1="/0_led_driver/Src/LED.C" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1656460772853"/>
+</session>

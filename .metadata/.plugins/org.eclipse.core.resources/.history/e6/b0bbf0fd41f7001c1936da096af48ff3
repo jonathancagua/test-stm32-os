@@ -1,0 +1,18 @@
+#include "led.h"
+
+
+void led_init(void)
+{
+	/*enable clock access to led port(GPIOB 14)*/
+	/*SET LED PIN AS OUTPUT (GPIOB 14)*/
+}
+
+void led_on(void)
+{
+	//set led pin en high (GPIOB 14)
+}
+
+void led_off(void)
+{
+	//set led pin en low (GPIOB 14)
+}
