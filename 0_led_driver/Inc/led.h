@@ -1,10 +1,13 @@
-/*
- * led.h
+/**
+ * @file led.h
+ * @author Jonathan Cagua(jonathan.cagua@gmail.com)
+ * @brief Header y definicion de prototipos
+ * @version 0.1
+ * @date 2022-06-29
  *
- *  Created on: Jun 28, 2022
- *      Author: dev_fw
+ * @copyright Copyright (c) 2022
+ *
  */
-
 #ifndef LED_H_
 #define LED_H_
 

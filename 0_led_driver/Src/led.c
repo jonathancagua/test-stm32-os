@@ -1,6 +1,6 @@
 /**
  * @file led.c
- * @author your name (jonathan.cagua@gmail.com)
+ * @author Jonathan Cagua(jonathan.cagua@gmail.com)
  * @brief Test con el portb y pin 14
  * @version 0.1
  * @date 2022-06-29
