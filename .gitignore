@@ -11,3 +11,4 @@ STM32Cube_FW_L4_V1.17.0/
 *.map
 *.list
 .metadata/
+.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
