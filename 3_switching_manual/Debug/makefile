@@ -59,8 +59,8 @@ all: main-build
 main-build: 3_switching_manual.elf secondary-outputs
 
 # Tool invocations
-3_switching_manual.elf 3_switching_manual.map: $(OBJS) $(USER_OBJS) C:\Users\dev_fw\STM32CubeIDE\workspace_1.9.0\3_switching_manual\STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "3_switching_manual.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\dev_fw\STM32CubeIDE\workspace_1.9.0\3_switching_manual\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="3_switching_manual.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+3_switching_manual.elf 3_switching_manual.map: $(OBJS) $(USER_OBJS) /Users/jonathancagua/STM32/test-stm32-os/3_switching_manual/STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "3_switching_manual.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/jonathancagua/STM32/test-stm32-os/3_switching_manual/STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="3_switching_manual.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
