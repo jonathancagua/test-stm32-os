@@ -1,5 +1,5 @@
-22:32:02 **** Clean-only build of configuration Debug for project 4_test_point ****
-make -j3 clean 
+18:16:53 **** Clean-only build of configuration Debug for project 4_test_point ****
+make -j8 clean 
 rm -rf ./Startup/startup_stm32l475vgtx.d ./Startup/startup_stm32l475vgtx.o
 rm -rf ./Src/SysTick_Handler.d ./Src/SysTick_Handler.o ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/timebase.d ./Src/timebase.o ./Src/timebase.su ./Src/uart.d ./Src/uart.o ./Src/uart.su
 rm -rf 4_test_point.elf 4_test_point.list 4_test_point.map default.size.stdout
