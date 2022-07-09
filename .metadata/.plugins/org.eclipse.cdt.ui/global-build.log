@@ -1,6 +1,21 @@
-18:16:53 **** Clean-only build of configuration Debug for project 4_test_point ****
-make -j8 clean 
-rm -rf ./Startup/startup_stm32l475vgtx.d ./Startup/startup_stm32l475vgtx.o
-rm -rf ./Src/SysTick_Handler.d ./Src/SysTick_Handler.o ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/timebase.d ./Src/timebase.o ./Src/timebase.su ./Src/uart.d ./Src/uart.o ./Src/uart.su
-rm -rf 4_test_point.elf 4_test_point.list 4_test_point.map default.size.stdout
+18:52:41 **** Build of configuration Debug for project 5_test_os ****
+make -j8 all 
+arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -x assembler-with-cpp -MMD -MP -MF"Startup/startup_stm32l475vgtx.d" -MT"Startup/startup_stm32l475vgtx.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Startup/startup_stm32l475vgtx.o" "../Startup/startup_stm32l475vgtx.s"
+arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -x assembler-with-cpp -MMD -MP -MF"Src/SysTick_Handler.d" -MT"Src/SysTick_Handler.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/SysTick_Handler.o" "../Src/SysTick_Handler.s"
+arm-none-eabi-gcc "../Src/led.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/led.d" -MT"Src/led.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/led.o"
+arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/main.o"
+arm-none-eabi-gcc "../Src/syscalls.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/syscalls.d" -MT"Src/syscalls.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/syscalls.o"
+arm-none-eabi-gcc "../Src/sysmem.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/sysmem.d" -MT"Src/sysmem.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/sysmem.o"
+arm-none-eabi-gcc "../Src/timebase.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/timebase.d" -MT"Src/timebase.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/timebase.o"
+arm-none-eabi-gcc "../Src/uart.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/uart.d" -MT"Src/uart.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/uart.o"
+arm-none-eabi-gcc -o "5_test_os.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\dev_fw\STM32CubeIDE\workspace_1.9.0\5_test_os\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="5_test_os.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 5_test_os.elf
+ 
+arm-none-eabi-size   5_test_os.elf 
+arm-none-eabi-objdump -h -S  5_test_os.elf  > "5_test_os.list"
+   text	   data	    bss	    dec	    hex	filename
+   1092	      8	   1608	   2708	    a94	5_test_os.elf
+Finished building: default.size.stdout
+ 
+Finished building: 5_test_os.list
  

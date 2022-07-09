@@ -40,7 +40,7 @@ C_DEPS += \
 Src/%.o: ../Src/%.s Src/subdir.mk
 	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -x assembler-with-cpp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
 Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/4_test_point/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/4_test_point/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 
 clean: clean-Src
 
