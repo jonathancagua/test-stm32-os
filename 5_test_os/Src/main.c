@@ -17,6 +17,9 @@
 uint32_t sp_antes, sp_durante, sp_despues;
 uint32_t stackFrame[8];
 
+uint32_t sp_tarea1;					//Stack Pointer para la tarea 1
+uint32_t sp_tarea2;					//Stack Pointer para la tarea 2
+
 int main(void)
 {
 	led_init();
