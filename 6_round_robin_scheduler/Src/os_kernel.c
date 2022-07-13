@@ -113,7 +113,17 @@ __attribute__((naked)) void SysTick_Handler(void)
 }
 void os_scheduler_launch(void)
 {
+	__asm("LDR R0,=currentPt");			//Cargar la dirección de currentPt en R0
+	__asm("LDR R2,[r0]");				//Cargar en r2 desde la dirección r0, r2 =currentPt
+	__asm("LDR  SP,[R2]");				//Cargar en SP la direccion R2,SP = currentPt->stackPt
+	__asm("POP {R4-R11}");				//Se restaura r4,r5,r6,r7,r8,r9,r10,11
+	__asm("POP {R12}");					//restaurar r12
+	__asm("POP	{R0-R3}");				//Se restaura r0,r1,r2,r3
 
+	__asm("ADD  SP,SP,#4");				//salto LR
+	__asm("POP {LR}");					//Cree una nueva ubicación de popping LR
+	__asm("ADD  SP,SP,#4");				//Salto el PSR sumando 4 a SP
+	__asm("CPSIE	I");				//Activar las interrupciones globales
+	__asm("BX	LR");					//Volver de la excepción y restaurar r0,r1,r2,r3,r12,lr,pc,psr
 }
-
 
