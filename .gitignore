@@ -11,7 +11,6 @@ STM32Cube_FW_L4_V1.17.0/
 *.map
 *.list
 .metadata/
-.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
 
 4_test_point/chip_headers/CMSIS/DSP
 4_test_point/chip_headers/CMSIS/NN
@@ -30,3 +29,9 @@ STM32Cube_FW_L4_V1.17.0/
 6_round_robin_scheduler/chip_headers/CMSIS/RTOS
 6_round_robin_scheduler/chip_headers/CMSIS/RTOS2
 6_round_robin_scheduler/chip_headers/CMSIS/docs
+
+7_Cooperative_Scheduler/chip_headers/CMSIS/DSP
+7_Cooperative_Scheduler/chip_headers/CMSIS/NN
+7_Cooperative_Scheduler/chip_headers/CMSIS/RTOS
+7_Cooperative_Scheduler/chip_headers/CMSIS/RTOS2
+7_Cooperative_Scheduler/chip_headers/CMSIS/docs

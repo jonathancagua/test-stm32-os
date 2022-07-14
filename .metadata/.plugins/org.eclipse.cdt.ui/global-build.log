@@ -1,7 +1,18 @@
-23:11:48 **** Incremental Build of configuration Debug for project 6_round_robin_scheduler ****
+21:11:52 **** Incremental Build of configuration Debug for project 7_Cooperative_Scheduler ****
 make -j3 all 
-arm-none-eabi-size   6_round_robin_scheduler.elf 
+arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"/Users/jonathancagua/STM32/test-stm32-os/7_Cooperative_Scheduler/chip_headers/CMSIS/Include" -I"/Users/jonathancagua/STM32/test-stm32-os/7_Cooperative_Scheduler/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Src/main.o"
+../Src/main.c: In function 'main':
+../Src/main.c:29:20: warning: unused variable 'start' [-Wunused-variable]
+   29 |  uint32_t volatile start  = 0U;
+      |                    ^~~~~
+arm-none-eabi-gcc -o "7_Cooperative_Scheduler.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/jonathancagua/STM32/test-stm32-os/7_Cooperative_Scheduler/STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="7_Cooperative_Scheduler.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: 7_Cooperative_Scheduler.elf
+ 
+arm-none-eabi-size   7_Cooperative_Scheduler.elf 
+arm-none-eabi-objdump -h -S  7_Cooperative_Scheduler.elf  > "7_Cooperative_Scheduler.list"
    text	   data	    bss	    dec	    hex	filename
-   5960	    112	   1600	   7672	   1df8	6_round_robin_scheduler.elf
+   1936	      8	   2808	   4752	   1290	7_Cooperative_Scheduler.elf
 Finished building: default.size.stdout
+ 
+Finished building: 7_Cooperative_Scheduler.list
  
