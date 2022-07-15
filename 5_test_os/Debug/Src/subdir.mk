@@ -10,6 +10,7 @@ S_SRCS += \
 C_SRCS += \
 ../Src/led.c \
 ../Src/main.c \
+../Src/os_kernel.c \
 ../Src/syscalls.c \
 ../Src/sysmem.c \
 ../Src/timebase.c \
@@ -19,6 +20,7 @@ OBJS += \
 ./Src/SysTick_Handler.o \
 ./Src/led.o \
 ./Src/main.o \
+./Src/os_kernel.o \
 ./Src/syscalls.o \
 ./Src/sysmem.o \
 ./Src/timebase.o \
@@ -30,6 +32,7 @@ S_DEPS += \
 C_DEPS += \
 ./Src/led.d \
 ./Src/main.d \
+./Src/os_kernel.d \
 ./Src/syscalls.d \
 ./Src/sysmem.d \
 ./Src/timebase.d \
@@ -45,7 +48,7 @@ Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/SysTick_Handler.d ./Src/SysTick_Handler.o ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/timebase.d ./Src/timebase.o ./Src/timebase.su ./Src/uart.d ./Src/uart.o ./Src/uart.su
+	-$(RM) ./Src/SysTick_Handler.d ./Src/SysTick_Handler.o ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/os_kernel.d ./Src/os_kernel.o ./Src/os_kernel.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/timebase.d ./Src/timebase.o ./Src/timebase.su ./Src/uart.d ./Src/uart.o ./Src/uart.su
 
 .PHONY: clean-Src
 
