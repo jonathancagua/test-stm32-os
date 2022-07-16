@@ -18,6 +18,58 @@ struct header_struct {
    char     tail[4];
 } header={"head",0,256,5000,"tail"};
 
+uint32_t cyclesCounterRead( void );
+void cyclesCounterReset( void );
+void cyclesCounterInit( void );
+uint32_t adcRead();
+
+void trigger(int16_t threshold)
+{
+   while((adcRead()-512)>threshold)
+      ;
+   while((adcRead()-512)<threshold)
+      ;
+   return;
+}
+
+void app1_main(){
+	uint16_t sample = 0;
+	uint32_t muestra_inicial;
+	arm_cfft_instance_q15 CS;
+	int16_t adc [ header.N ];
+	cyclesCounterInit();
+	while(1) {
+	  cyclesCounterReset();
+	  adc[sample] = (int16_t )adcRead()-512;                        // va de -512 a 511
+	  HAL_UART_Transmit(&huart1, (uint8_t* )&adc[sample], sizeof(adc[0]), 1);
+	  muestra_inicial = DWT->CTRL ;//HAL_GetTick();
+	  if ( ++sample==header.N ) {
+		sample = 0;
+		//trigger(2);
+		header.id++;
+		HAL_UART_Transmit(&huart1, (uint8_t* )&header, sizeof(header ), 0xffff);
+		adcRead(); //why?? hay algun efecto minimo en el 1er sample.. puede ser por el blinkeo de los leds o algo que me corre 10 puntos el primer sample. Con esto se resuelve.. habria que investigar el problema en detalle
+	  }
+	  while(cyclesCounterRead() < NUCLEO_CLOCK_SPEED/header.fs) // el clk de la nucleo es 80M
+	    ;
+	}
+
+}
+//---------------SACADO DE LA EDU CIAA-------------
+
+uint32_t cyclesCounterRead( void ){
+   return DWT->CYCCNT;
+}
+
+void cyclesCounterReset( void ){
+   //resetea el contador de ciclos de clock
+	DWT->CYCCNT = 0;
+}
+
+void cyclesCounterInit( void ){
+   //resetea el contador de ciclos de clock
+	DWT->CTRL |= 1;
+}
 
 uint32_t adcRead()
 {
@@ -29,37 +81,4 @@ uint32_t adcRead()
   HAL_ADC_Stop(&hadc2);
 
   return ADCValue;
-}
-
-void trigger(int16_t threshold)
-{
-   while((adcRead()-512)>threshold)
-      ;
-   while((adcRead()-512)<threshold)
-      ;
-   return;
-}
-
-
-void app1_main(){
-	uint16_t sample = 0;
-	uint32_t muestra_inicial;
-	arm_cfft_instance_q15 CS;
-	int16_t adc [ header.N ];
-	while(1) {
-	  //cyclesCounterReset();
-	  adc[sample] = (int16_t )adcRead()-512;                        // va de -512 a 511
-	  HAL_UART_Transmit(&huart1, (uint8_t* )&adc[sample], sizeof(adc[0]), 1);
-	  muestra_inicial = HAL_GetTick();
-	  if ( ++sample==header.N ) {
-		sample = 0;
-		//trigger(2);
-		header.id++;
-		HAL_UART_Transmit(&huart1, (uint8_t* )&header, sizeof(header ), 1);
-		adcRead(); //why?? hay algun efecto minimo en el 1er sample.. puede ser por el blinkeo de los leds o algo que me corre 10 puntos el primer sample. Con esto se resuelve.. habria que investigar el problema en detalle
-	  }
-	  while((HAL_GetTick() - muestra_inicial) < NUCLEO_CLOCK_SPEED/header.fs) // el clk de la CIAA es 204000000
-	    ;
-	}
-
 }
