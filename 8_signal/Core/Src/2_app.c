@@ -39,8 +39,8 @@ void app2_main( void ) {
    int16_t len;
    char buf [200] = {0};
 
-   q7_t a = 0x040;
-   q7_t b = 0x023;
+   q7_t a = 0x40;
+   q7_t b = 0x23;
 
    while(1) {
       len=printQ7(a,buf);
