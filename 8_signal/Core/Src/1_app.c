@@ -34,7 +34,7 @@ void trigger(int16_t threshold)
 
 void app1_main(){
 	uint16_t sample = 0;
-	uint32_t muestra_inicial;
+	//uint32_t muestra_inicial;
 	arm_cfft_instance_q15 CS;
 	int16_t adc [ header.N ];
 	cyclesCounterInit();
@@ -42,7 +42,7 @@ void app1_main(){
 	  cyclesCounterReset();
 	  adc[sample] = (int16_t )adcRead()-512;                        // va de -512 a 511
 	  HAL_UART_Transmit(&huart1, (uint8_t* )&adc[sample], sizeof(adc[0]), 1);
-	  muestra_inicial = DWT->CTRL ;//HAL_GetTick();
+	  //muestra_inicial = DWT->CTRL ;//HAL_GetTick();
 	  if ( ++sample==header.N ) {
 		sample = 0;
 		//trigger(2);

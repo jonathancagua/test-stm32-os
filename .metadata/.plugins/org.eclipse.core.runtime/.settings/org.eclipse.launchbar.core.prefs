@@ -1,7 +1,7 @@
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/name=Local
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=win32
-configDescList=org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:5_test_os Debug,org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:8_signal Debug
+configDescList=org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:8_signal Debug
 eclipse.preferences.version=1
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:0_led_driver\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:0_led_driver\ Debug/activeLaunchTarget=null\:---
@@ -9,5 +9,7 @@ org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:3_switching_manual/activeLaunch
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:4_test_point\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:5_test_os\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:5_test_os\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:8_signal\ Debug/activeLaunchMode=debug
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:8_signal\ Debug/activeLaunchTarget=null\:---
 org.eclipse.launchbar.core.descriptorType.default\:4_test_point\ Debug/activeLaunchMode=debug
 org.eclipse.launchbar.core.descriptorType.default\:4_test_point\ Debug/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local

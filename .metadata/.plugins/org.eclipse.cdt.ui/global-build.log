@@ -1,18 +1,30 @@
-12:12:07 **** Incremental Build of configuration Debug for project 8_signal ****
-make -j8 all 
-arm-none-eabi-gcc "../Core/Src/1_app.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L475xx -c -I../Core/Inc -I../Drivers/CMSIS/DSP/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/1_app.d" -MT"Core/Src/1_app.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/1_app.o"
-../Core/Src/1_app.c: In function 'app1_main':
-../Core/Src/1_app.c:47:24: warning: unused variable 'CS' [-Wunused-variable]
-   47 |  arm_cfft_instance_q15 CS;
-      |                        ^~
-arm-none-eabi-gcc -o "8_signal.elf" @"objects.list"  -larm_cortexM4lf_math -mcpu=cortex-m4 -T"C:\Users\dev_fw\STM32CubeIDE\workspace_1.9.0\8_signal\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="8_signal.map" -Wl,--gc-sections -static -L"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/8_signal\Drivers\CMSIS\Lib\GCC" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+17:20:52 **** Incremental Build of configuration Debug for project 8_signal ****
+make -j3 all 
+arm-none-eabi-gcc "../Core/Src/2_app.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L475xx -c -I../Core/Inc -I../Drivers/CMSIS/DSP/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/2_app.d" -MT"Core/Src/2_app.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/2_app.o"
+../Core/Src/2_app.c: In function 'printQ7':
+../Core/Src/2_app.c:33:11: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+   33 |    return sprintf(buf,"q7: dec: %i hex: 0x%x float:%.20f\r\n",n,n,ans);
+      |           ^~~~~~~
+../Core/Src/2_app.c:33:11: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/2_app.c:12:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+   11 | #include "usart.h"
+  +++ |+#include <stdio.h>
+   12 | 
+arm-none-eabi-gcc -o "8_signal.elf" @"objects.list"   -mcpu=cortex-m4 -T"/Users/jonathancagua/STM32/test-stm32-os/8_signal/STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="8_signal.map" -Wl,--gc-sections -static -L"/Users/jonathancagua/STM32/test-stm32-os/8_signal\Drivers\CMSIS\Lib\GCC" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: 8_signal.elf
  
 arm-none-eabi-size   8_signal.elf 
 arm-none-eabi-objdump -h -S  8_signal.elf  > "8_signal.list"
    text	   data	    bss	    dec	    hex	filename
-  22004	     36	   2020	  24060	   5dfc	8_signal.elf
+  35860	    484	   2044	  38388	   95f4	8_signal.elf
 Finished building: default.size.stdout
  
 Finished building: 8_signal.list
+ 
+17:20:59 **** Incremental Build of configuration Debug for project 8_signal ****
+make -j3 all 
+arm-none-eabi-size   8_signal.elf 
+   text	   data	    bss	    dec	    hex	filename
+  35860	    484	   2044	  38388	   95f4	8_signal.elf
+Finished building: default.size.stdout
  

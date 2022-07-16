@@ -60,8 +60,8 @@ all: main-build
 main-build: 8_signal.elf secondary-outputs
 
 # Tool invocations
-8_signal.elf 8_signal.map: $(OBJS) $(USER_OBJS) C:\Users\dev_fw\STM32CubeIDE\workspace_1.9.0\8_signal\STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "8_signal.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\dev_fw\STM32CubeIDE\workspace_1.9.0\8_signal\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="8_signal.map" -Wl,--gc-sections -static -L"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/8_signal\Drivers\CMSIS\Lib\GCC" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+8_signal.elf 8_signal.map: $(OBJS) $(USER_OBJS) /Users/jonathancagua/STM32/test-stm32-os/8_signal/STM32L475VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "8_signal.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/jonathancagua/STM32/test-stm32-os/8_signal/STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="8_signal.map" -Wl,--gc-sections -static -L"/Users/jonathancagua/STM32/test-stm32-os/8_signal\Drivers\CMSIS\Lib\GCC" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

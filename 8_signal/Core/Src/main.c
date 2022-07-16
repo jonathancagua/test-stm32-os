@@ -101,7 +101,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_UART_Transmit(&huart1, "hola", 5, 1);
-  app1_main();
+  //app1_main();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -111,7 +111,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	app1_main();
+	app2_main();
 	HAL_Delay(1000);
   }
   /* USER CODE END 3 */
