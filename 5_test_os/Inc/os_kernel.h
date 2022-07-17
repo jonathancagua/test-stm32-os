@@ -22,5 +22,5 @@ struct task_block {
     uint32_t wakeup_time;			// el de despertar
 };
 struct task_block *task_create(char *name, void (*start)(void *arg), void *arg);
-
+void os_init(void);
 #endif /* OS_KERNEL_H_ */

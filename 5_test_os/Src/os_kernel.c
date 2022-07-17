@@ -6,6 +6,7 @@
  */
 
 #include "os_kernel.h"
+#include "stm32l4xx.h"
 
 #define MAX_TASKS			3U
 #define STACKSIZE			100U
@@ -13,18 +14,21 @@
 #define TASK_WAITING 		0U
 #define TASK_READY   		1U
 #define TASK_RUNNING 		2U
-
 //este stack es reservado
 uint32_t 	tcb_stack_a[MAX_TASKS][STACKSIZE];//tcb stack
 static int n_tasks = 1;
 static struct task_block TASKS[MAX_TASKS];
+
+uint32_t sp_tarea1;					//Stack Pointer para la tarea 1
+uint32_t sp_tarea2;					//Stack Pointer para la tarea 2
+
 struct task_block *task_list_active = NULL;
 struct stack_frame {
     uint32_t r0, r1, r2, r3, r12, lr, pc, xpsr;
 };
 #define stack_frame_size  sizeof(struct stack_frame) / sizeof(uint32_t)
 struct extra_frame {
-    uint32_t r4, r5, r6, r7, r8, r9, r10, r11;
+    uint32_t r4, r5, r6, r7, r8, r9, r10, r11,lr_prev_value;
 };
 #define extra_frame_size  sizeof(struct extra_frame) / sizeof(uint32_t)
 void task_terminated(void)
@@ -35,13 +39,16 @@ void task_terminated(void)
 static void task_stack_init(struct task_block *t)
 {
     struct stack_frame *tf;
+    struct extra_frame *exf;
     t->sp -= stack_frame_size;
     tf = (struct stack_frame *)(t->sp);
     tf->r0 = (uint32_t) t->arg;
     tf->pc = (uint32_t) t->start;
-    tf->lr = (uint32_t) task_terminated;
+    tf->lr = (uint32_t) task_terminated ;
     tf->xpsr =  (1 << 24);
     t->sp -= extra_frame_size;
+    exf = (struct extra_frame *)(t->sp);
+    exf->lr_prev_value = 0xFFFFFFF9;
 }
 
 static void task_list_add(struct task_block **list, struct task_block *el)
@@ -71,4 +78,77 @@ struct task_block *task_create(char *name, void (*start)(void *arg), void *arg)
     task_stack_init(t);
     task_list_add(&task_list_active, t);
     return t;
+}
+
+//=========================PARA MANEJO DE SWITCH=======================
+void os_init(void){
+	/*
+	 * Todas las interrupciones tienen prioridad 0 (la maxima) al iniciar la ejecucion. Para que
+	 * no se de la condicion de fault mencionada en la teoria, debemos bajar su prioridad en el
+	 * NVIC. La cuenta matematica que se observa da la probabilidad mas baja posible.
+	 */
+	NVIC_SetPriority(PendSV_IRQn, (1 << __NVIC_PRIO_BITS)-1);
+}
+
+
+void SysTick_Handler(void)
+{
+	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+	/**
+	 * Instruction Synchronization Barrier; flushes the pipeline and ensures that
+	 * all previous instructions are completed before executing new instructions
+	 */
+	__ISB();
+
+	/**
+	 * Data Synchronization Barrier; ensures that all memory accesses are
+	 * completed before next instruction is executed
+	 */
+	__DSB();
+}
+
+uint32_t get_next_context(uint32_t sp_actual)  {
+	static int32_t tarea_actual = -1;
+	uint32_t sp_siguiente;
+
+	/**
+	 * Este bloque switch-case hace las veces de scheduler. Es el mismo codigo que
+	 * estaba anteriormente implementado en el Systick handler
+	 */
+	switch(tarea_actual)  {
+
+	/**
+	 * Tarea actual es tarea1. Recuperamos el stack pointer (MSP) y lo
+	 * almacenamos en sp_tarea1. Luego cargamos en la variable de retorno
+	 * sp_siguiente el valor del stack pointer de la tarea2
+	 */
+	case 1:
+		sp_tarea1 = sp_actual;
+		sp_siguiente = sp_tarea2;
+		tarea_actual = 2;
+		break;
+
+	/**
+	 * Tarea actual es tarea2. Recuperamos el stack pointer (MSP) y lo
+	 * almacenamos en sp_tarea2. Luego cargamos en la variable de retorno
+	 * sp_siguiente el valor del stack pointer de la tarea1
+	 */
+	case 2:
+		sp_tarea2 = sp_actual;
+		sp_siguiente = sp_tarea1;
+		tarea_actual = 1;
+		break;
+
+	/**
+	 * Este es el caso del inicio del sistema, donde no se ha llegado aun a la
+	 * primer ejecucion de tarea1. Por lo que se cargan los valores correspondientes
+	 */
+
+	default:
+		sp_siguiente = sp_tarea1;
+		tarea_actual = 1;
+		break;
+	}
+
+	return sp_siguiente;
 }

@@ -14,10 +14,10 @@ C_SRCS += \
 ../Src/uart.c 
 
 S_UPPER_SRCS += \
-../Src/SysTick_Handler.S 
+../Src/PendSV_Handler.S 
 
 OBJS += \
-./Src/SysTick_Handler.o \
+./Src/PendSV_Handler.o \
 ./Src/led.o \
 ./Src/main.o \
 ./Src/os_kernel.o \
@@ -27,7 +27,7 @@ OBJS += \
 ./Src/uart.o 
 
 S_UPPER_DEPS += \
-./Src/SysTick_Handler.d 
+./Src/PendSV_Handler.d 
 
 C_DEPS += \
 ./Src/led.d \
@@ -48,7 +48,7 @@ Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/SysTick_Handler.d ./Src/SysTick_Handler.o ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/os_kernel.d ./Src/os_kernel.o ./Src/os_kernel.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/timebase.d ./Src/timebase.o ./Src/timebase.su ./Src/uart.d ./Src/uart.o ./Src/uart.su
+	-$(RM) ./Src/PendSV_Handler.d ./Src/PendSV_Handler.o ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/os_kernel.d ./Src/os_kernel.o ./Src/os_kernel.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/timebase.d ./Src/timebase.o ./Src/timebase.su ./Src/uart.d ./Src/uart.o ./Src/uart.su
 
 .PHONY: clean-Src
 

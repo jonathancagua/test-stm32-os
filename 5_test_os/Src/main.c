@@ -17,8 +17,8 @@
 uint32_t sp_antes, sp_durante, sp_despues;
 uint32_t stackFrame[8];
 
-uint32_t sp_tarea1;					//Stack Pointer para la tarea 1
-uint32_t sp_tarea2;					//Stack Pointer para la tarea 2
+extern uint32_t sp_tarea1;					//Stack Pointer para la tarea 1
+extern uint32_t sp_tarea2;					//Stack Pointer para la tarea 2
 
 void task1(void *arg)
 {
@@ -44,6 +44,7 @@ int main(void)
 	led_init();
 	uart_tx_init();
 	tick_init();
+	os_init();
 	task_block1 = task_create("tarea1", task1, NULL);
 	sp_tarea1 = task_block1->sp;
 	task_block2 = task_create("tarea1", task2, NULL);
@@ -51,7 +52,7 @@ int main(void)
     /* Loop forever */
 
 	while (1) {
-		__WFI();
+		//__WFI();
 	}
 }
 
