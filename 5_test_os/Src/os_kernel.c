@@ -23,7 +23,10 @@ struct stack_frame {
     uint32_t r0, r1, r2, r3, r12, lr, pc, xpsr;
 };
 #define stack_frame_size  sizeof(struct stack_frame) / sizeof(uint32_t)
-
+struct extra_frame {
+    uint32_t r4, r5, r6, r7, r8, r9, r10, r11;
+};
+#define extra_frame_size  sizeof(struct extra_frame) / sizeof(uint32_t)
 void task_terminated(void)
 {
     while(1) ;;
@@ -38,6 +41,7 @@ static void task_stack_init(struct task_block *t)
     tf->pc = (uint32_t) t->start;
     tf->lr = (uint32_t) task_terminated;
     tf->xpsr =  (1 << 24);
+    t->sp -= extra_frame_size;
 }
 
 static void task_list_add(struct task_block **list, struct task_block *el)

@@ -4,9 +4,6 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-S_SRCS += \
-../Src/SysTick_Handler.s 
-
 C_SRCS += \
 ../Src/led.c \
 ../Src/main.c \
@@ -15,6 +12,9 @@ C_SRCS += \
 ../Src/sysmem.c \
 ../Src/timebase.c \
 ../Src/uart.c 
+
+S_UPPER_SRCS += \
+../Src/SysTick_Handler.S 
 
 OBJS += \
 ./Src/SysTick_Handler.o \
@@ -26,7 +26,7 @@ OBJS += \
 ./Src/timebase.o \
 ./Src/uart.o 
 
-S_DEPS += \
+S_UPPER_DEPS += \
 ./Src/SysTick_Handler.d 
 
 C_DEPS += \
@@ -40,10 +40,10 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-Src/%.o: ../Src/%.s Src/subdir.mk
+Src/%.o: ../Src/%.S Src/subdir.mk
 	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -x assembler-with-cpp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
 Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Include" -I"C:/Users/dev_fw/STM32CubeIDE/workspace_1.9.0/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DSTM32L475xx -c -I../Inc -I"/Users/jonathancagua/STM32/test-stm32-os/5_test_os/chip_headers/CMSIS/Include" -I"/Users/jonathancagua/STM32/test-stm32-os/5_test_os/chip_headers/CMSIS/Device/ST/STM32L4xx/Include" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 
 clean: clean-Src
 
