@@ -21,7 +21,7 @@ static struct task_block TASKS[MAX_TASKS];
 
 uint32_t sp_tarea1;					//Stack Pointer para la tarea 1
 uint32_t sp_tarea2;					//Stack Pointer para la tarea 2
-
+uint32_t sp_tarea3;					//Stack Pointer para la tarea 2
 struct task_block *task_list_active = NULL;
 struct stack_frame {
     uint32_t r0, r1, r2, r3, r12, lr, pc, xpsr;
@@ -62,7 +62,7 @@ struct task_block *task_create(char *name, void (*start)(void *arg), void *arg)
     struct task_block *t;
     int i;
 
-    if (n_tasks >= MAX_TASKS) return NULL;
+    if (n_tasks > MAX_TASKS) return NULL;
     t = &TASKS[n_tasks - 1];
     t->id = n_tasks++;
     for (i = 0; i < TASK_NAME_MAX_LEN; i++) {
@@ -135,10 +135,14 @@ uint32_t get_next_context(uint32_t sp_actual)  {
 	 */
 	case 2:
 		sp_tarea2 = sp_actual;
+		sp_siguiente = sp_tarea3;
+		tarea_actual = 3;
+		break;
+	case 3:
+		sp_tarea3 = sp_actual;
 		sp_siguiente = sp_tarea1;
 		tarea_actual = 1;
 		break;
-
 	/**
 	 * Este es el caso del inicio del sistema, donde no se ha llegado aun a la
 	 * primer ejecucion de tarea1. Por lo que se cargan los valores correspondientes
