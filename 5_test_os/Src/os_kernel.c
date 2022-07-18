@@ -8,6 +8,12 @@
 #include "os_kernel.h"
 #include "stm32l4xx.h"
 
+#define ONE_SEC_LOAD		4000000//Startup clock ES DE 4mhz LO DICE EL DATA
+#define CTRL_ENABLE			(1U<<0)
+#define CTRL_TICK_INT		(1U<<1)
+#define CTRL_CLCK_SRC		(1U<<2)
+#define CTRL_COUNT_FLAG		(1U<<16)
+
 #define MAX_TASKS			3U
 #define STACKSIZE			100U
 
@@ -15,14 +21,11 @@
 #define TASK_READY   		1U
 #define TASK_RUNNING 		2U
 //este stack es reservado
-uint32_t 	tcb_stack_a[MAX_TASKS][STACKSIZE];//tcb stack
-static int n_tasks = 1;
-static struct task_block TASKS[MAX_TASKS];
+uint32_t 			tcb_stack_a[MAX_TASKS][STACKSIZE];//tcb stack
+static int 			n_tasks = 1;
+static struct 		task_block TASKS[MAX_TASKS];
 
-uint32_t sp_tarea1;					//Stack Pointer para la tarea 1
-uint32_t sp_tarea2;					//Stack Pointer para la tarea 2
-uint32_t sp_tarea3;					//Stack Pointer para la tarea 2
-struct task_block *task_list_active = NULL;
+struct task_block 	*task_list_active = NULL;
 struct stack_frame {
     uint32_t r0, r1, r2, r3, r12, lr, pc, xpsr;
 };
@@ -31,6 +34,7 @@ struct extra_frame {
     uint32_t r4, r5, r6, r7, r8, r9, r10, r11,lr_prev_value;
 };
 #define extra_frame_size  sizeof(struct extra_frame) / sizeof(uint32_t)
+
 void task_terminated(void)
 {
     while(1) ;;
@@ -81,7 +85,18 @@ struct task_block *task_create(char *name, void (*start)(void *arg), void *arg)
 }
 
 //=========================PARA MANEJO DE SWITCH=======================
+static void os_tick_init(void)
+{
+	SysTick->LOAD =  ONE_SEC_LOAD - 1;//Cargar el numero de ciclos por segundo
+	SysTick->VAL  = 0;//Limpiar el Systick
+	SysTick->CTRL  = CTRL_CLCK_SRC;//seleccionar el clock interno
+	SysTick->CTRL  |= CTRL_TICK_INT;//activar interrupcion
+	SysTick->CTRL  |= CTRL_ENABLE;//activar el systick
+	__enable_irq();//activar interrrupcion global
+}
+
 void os_init(void){
+	os_tick_init();
 	/*
 	 * Todas las interrupciones tienen prioridad 0 (la maxima) al iniciar la ejecucion. Para que
 	 * no se de la condicion de fault mencionada en la teoria, debemos bajar su prioridad en el
@@ -89,7 +104,6 @@ void os_init(void){
 	 */
 	NVIC_SetPriority(PendSV_IRQn, (1 << __NVIC_PRIO_BITS)-1);
 }
-
 
 void SysTick_Handler(void)
 {
@@ -108,51 +122,16 @@ void SysTick_Handler(void)
 }
 
 uint32_t get_next_context(uint32_t sp_actual)  {
-	static int32_t tarea_actual = -1;
-	uint32_t sp_siguiente;
 
-	/**
-	 * Este bloque switch-case hace las veces de scheduler. Es el mismo codigo que
-	 * estaba anteriormente implementado en el Systick handler
-	 */
-	switch(tarea_actual)  {
+	static int run_task_id = -1;//task que esta corriendo
 
-	/**
-	 * Tarea actual es tarea1. Recuperamos el stack pointer (MSP) y lo
-	 * almacenamos en sp_tarea1. Luego cargamos en la variable de retorno
-	 * sp_siguiente el valor del stack pointer de la tarea2
-	 */
-	case 1:
-		sp_tarea1 = sp_actual;
-		sp_siguiente = sp_tarea2;
-		tarea_actual = 2;
-		break;
-
-	/**
-	 * Tarea actual es tarea2. Recuperamos el stack pointer (MSP) y lo
-	 * almacenamos en sp_tarea2. Luego cargamos en la variable de retorno
-	 * sp_siguiente el valor del stack pointer de la tarea1
-	 */
-	case 2:
-		sp_tarea2 = sp_actual;
-		sp_siguiente = sp_tarea3;
-		tarea_actual = 3;
-		break;
-	case 3:
-		sp_tarea3 = sp_actual;
-		sp_siguiente = sp_tarea1;
-		tarea_actual = 1;
-		break;
-	/**
-	 * Este es el caso del inicio del sistema, donde no se ha llegado aun a la
-	 * primer ejecucion de tarea1. Por lo que se cargan los valores correspondientes
-	 */
-
-	default:
-		sp_siguiente = sp_tarea1;
-		tarea_actual = 1;
-		break;
+	if(run_task_id >=0){
+		TASKS[run_task_id].state = TASK_READY;
+		TASKS[run_task_id].sp = sp_actual;
 	}
-
-	return sp_siguiente;
+	run_task_id++;
+	if (run_task_id >= (n_tasks - 1))
+		run_task_id = 0;
+	TASKS[run_task_id].state = TASK_RUNNING;
+	return TASKS[run_task_id].sp;
 }
