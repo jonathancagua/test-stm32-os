@@ -6,7 +6,7 @@
 // al que el realmente se debia obtener.
 
 #include "arm_math.h"
-#include "arm_const_structs.h"
+//#include "arm_const_structs.h"
 #include "2_app.h"
 #include "usart.h"
 

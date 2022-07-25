@@ -4,6 +4,7 @@
  *  Created on: Jul 16, 2022
  *      Author: dev_fw
  */
+#ifdef app1
 #include "arm_math.h"
 #include "arm_const_structs.h"
 #include "1_app.h"
@@ -50,6 +51,7 @@ void app1_main(){
 		HAL_UART_Transmit(&huart1, (uint8_t* )&header, sizeof(header ), 0xffff);
 		adcRead(); //why?? hay algun efecto minimo en el 1er sample.. puede ser por el blinkeo de los leds o algo que me corre 10 puntos el primer sample. Con esto se resuelve.. habria que investigar el problema en detalle
 	  }
+	  //HAL_Delay(100);
 	  while(cyclesCounterRead() < NUCLEO_CLOCK_SPEED/header.fs) // el clk de la nucleo es 80M
 	    ;
 	}
@@ -82,3 +84,4 @@ uint32_t adcRead()
 
   return ADCValue;
 }
+#endif

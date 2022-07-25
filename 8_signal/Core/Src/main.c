@@ -26,8 +26,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "arm_math.h"
-#include "1_app.h"
+//#include "arm_math.h"
+#include "3_app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,7 +111,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	app2_main();
+	app3_main();
 	HAL_Delay(1000);
   }
   /* USER CODE END 3 */
