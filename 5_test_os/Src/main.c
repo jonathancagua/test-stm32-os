@@ -53,9 +53,9 @@ int main(void)
 	led_init();
 	uart_tx_init();
 	os_init();
-	task_block1 = task_create("tarea1", task1, NULL);
-	task_block2 = task_create("tarea2", task2, NULL);
-	task_block3 = task_create("tarea3", task3, NULL);
+	task_block1 = task_create("tarea1", task1, NULL,1);
+	task_block2 = task_create("tarea2", task2, NULL,2);
+	task_block3 = task_create("tarea3", task3, NULL,3);
     /* Loop forever */
 
 	while (1) {

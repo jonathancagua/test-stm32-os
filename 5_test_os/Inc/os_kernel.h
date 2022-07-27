@@ -23,7 +23,8 @@ struct task_block {
 	void                (*start)(void *arg);		//siempre sera tak(void *argumento))
 	void                *arg;						//el argumento
     uint32_t            wakeup_time;			    // el de despertar
+    uint8_t 			priority;
 };
-struct task_block *task_create(char *name, void (*start)(void *arg), void *arg);
+struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, int prio);
 void os_init(void);
 #endif /* OS_KERNEL_H_ */

@@ -17,16 +17,18 @@
 #define CTRL_TICK_INT		(1U<<1)
 #define CTRL_CLCK_SRC		(1U<<2)
 #define CTRL_COUNT_FLAG		(1U<<16)
-#define TASK_WAITING 		0U                          // estado de waiting de la tarea
+#define TASK_BLOCKED 		0U                          // estado de waiting de la tarea
 #define TASK_READY   		1U                          // estado de ready de la tarea y se pone cada 
                                                         // vez que se saca del switching a la tarea.
 #define TASK_RUNNING 		2U                          // estado de running de la tarea esto es cuando se esta ejecutadno
+#define PRIO_MAX  			4U
 //este stack es reservado
 uint32_t 			tcb_stack_a[MAX_TASKS][STACKSIZE];  // tcb stack es la memoria que usa el stack en ram.
 static int 			n_tasks = 1;                        // es usado como id de la tarea.
 static struct 		task_block TASKS[MAX_TASKS];        // bloque de variables usadas.
 
-struct task_block 	*task_list_active = NULL;           // puntero de las listas activas.
+struct task_block 	*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
+
 /**
  * @brief este es usado como el frame que se va respalda
  * 
@@ -79,6 +81,11 @@ static void task_list_add(struct task_block **list, struct task_block *el)
     el->next = *list;
     *list = el;
 }
+
+static void task_list_add_active(struct task_block *el)
+{
+    task_list_add(&task_list_active[el->priority], el);
+}
 /**
  * @brief Creamos la tarea del rtos y asignamos stack para la tarea y configuramos los
  *        contextos y asignamos el stack a la tarea.
@@ -88,7 +95,7 @@ static void task_list_add(struct task_block **list, struct task_block *el)
  * @param arg el argumento de la funcion.
  * @return struct task_block* 
  */
-struct task_block *task_create(char *name, void (*start)(void *arg), void *arg)
+struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, int prio)
 {
     struct task_block *t;
     int i;
@@ -106,8 +113,9 @@ struct task_block *task_create(char *name, void (*start)(void *arg), void *arg)
     t->arg = arg;                               // agregamos el argumento
     t->wakeup_time = 0;                         // seteamos en cero el wake up
     t->sp = &tcb_stack_a[(t->id)-1][STACKSIZE]; // como el stack pointer es el maximo valor del stack lo asignamos y x eso se usa stacksize
+    t->priority = prio;
     task_stack_init(t);                         // hacemos un init de los registro de respaldo.
-    task_list_add(&task_list_active, t);        // agregamos a la lista la tarea.
+    task_list_add_active(t);        // agregamos a la lista la tarea.
     return t;
 }
 
