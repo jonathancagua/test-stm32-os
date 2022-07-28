@@ -28,6 +28,7 @@ static int 			n_tasks = 1;                        // es usado como id de la tare
 static struct 		task_block TASKS[MAX_TASKS];        // bloque de variables usadas.
 
 struct task_block 	*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
+static struct task_block *t_cur = &TASKS[0];
 
 /**
  * @brief este es usado como el frame que se va respalda
@@ -85,6 +86,23 @@ static void task_list_add(struct task_block **list, struct task_block *el)
 static void task_list_add_active(struct task_block *el)
 {
     task_list_add(&task_list_active[el->priority], el);
+}
+
+static inline struct task_block *task_list_next_ready(struct task_block *t)
+{
+	static int idx = PRIO_MAX;
+	while(1){
+		idx--;
+		if(idx<0) idx = PRIO_MAX - 1;
+        if ((idx == t->priority) &&
+                (t->next != NULL) &&
+                (t->next->state == TASK_READY))
+            return t->next;
+        if (task_list_active[idx])
+            return task_list_active[idx];
+
+    }
+    return t;
 }
 /**
  * @brief Creamos la tarea del rtos y asignamos stack para la tarea y configuramos los
@@ -177,7 +195,7 @@ void SysTick_Handler(void)
 uint32_t get_next_context(uint32_t sp_actual)  {
 
 	static int run_task_id = -1;                // variable estatica para movernos entre el arreglo de tareas.
-
+	t_cur = task_list_next_ready(t_cur);
 	if(run_task_id >=0){                        // vemos que la tarea este dentro del rango de tareas 
 		TASKS[run_task_id].state = TASK_READY;  // ponemos la tarea actual que estaba corriendo en ready
 		TASKS[run_task_id].sp = sp_actual;      // guardamos el stack pointer de la tarea que estaba corriendo
