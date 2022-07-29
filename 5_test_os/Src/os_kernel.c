@@ -28,7 +28,7 @@ static int 			n_tasks = 1;                        // es usado como id de la tare
 static struct 		task_block TASKS[MAX_TASKS];        // bloque de variables usadas.
 
 struct task_block 	*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
-static struct task_block *t_cur = &TASKS[0];
+static struct task_block *t_cur = NULL;
 
 /**
  * @brief este es usado como el frame que se va respalda
@@ -90,10 +90,10 @@ static void task_list_add_active(struct task_block *el)
 
 static inline struct task_block *task_list_next_ready(struct task_block *t)
 {
-	static int idx = PRIO_MAX;
+	static int idx = 0;
 	while(1){
 		idx--;
-		if(idx<0) idx = PRIO_MAX - 1;
+		if(idx<0) idx = PRIO_MAX;
         if ((idx == t->priority) &&
                 (t->next != NULL) &&
                 (t->next->state == TASK_READY))
@@ -193,16 +193,10 @@ void SysTick_Handler(void)
  * @return uint32_t el stack pointer de la siguiente tarea.
  */
 uint32_t get_next_context(uint32_t sp_actual)  {
-
-	static int run_task_id = -1;                // variable estatica para movernos entre el arreglo de tareas.
-	t_cur = task_list_next_ready(t_cur);
-	if(run_task_id >=0){                        // vemos que la tarea este dentro del rango de tareas 
-		TASKS[run_task_id].state = TASK_READY;  // ponemos la tarea actual que estaba corriendo en ready
-		TASKS[run_task_id].sp = sp_actual;      // guardamos el stack pointer de la tarea que estaba corriendo
+	if(t_cur){
+		t_cur->state = TASK_READY;
+		t_cur->sp = sp_actual;
 	}
-	run_task_id++;                              // nos movemos a la siguiente tarea.
-	if (run_task_id >= (n_tasks - 1))           // vemos si es que llegamos al limite
-		run_task_id = 0;                        // iniciamos las tareas.
-	TASKS[run_task_id].state = TASK_RUNNING;    // nos ponemos en la siguiete tarea y ponemos en estado de running
-	return TASKS[run_task_id].sp;               // retornamos el stack pointer de donde se quedo la tarea que va ejecuatar ahora.
+	t_cur = task_list_next_ready(t_cur);
+	return t_cur->sp;
 }
