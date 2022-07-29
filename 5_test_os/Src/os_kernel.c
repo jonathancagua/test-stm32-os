@@ -48,12 +48,33 @@ struct extra_frame {
 };
 // sacamos el tamaño del extra frame
 #define extra_frame_size  sizeof(struct extra_frame) / sizeof(uint32_t)
+/**
+ * @brief usado para debug de errores del os
+ *
+ * @param caller		Puntero a la funcion donde fue llamado errorHook. Implementado solo a
+ *  					fines de trazabilidad de errores
+ */
+void __attribute__((weak)) os_error(void *caller)  {
+	while(1);
+}
+/**
+ * @brief va ser usada en tick timer
+ *
+ * @warning	Esta funcion debe ser lo mas corta posible porque se ejecuta dentro del handler
+ *   			mencionado, por lo que tiene prioridad sobre el cambio de contexto y otras IRQ.
+ *
+ * @warning 	Esta funcion no debe bajo ninguna circunstancia utilizar APIs del OS dado
+ *  			que podria dar lugar a un nuevo scheduling.
+ */
+void __attribute__((weak)) task_tick(void)  {
+	__asm volatile( "nop" );
+}
 
 /**
- * @brief task terminada con loop infinito.
+ * @brief task terminada con loop infinito, no se deberia entrar en este estado
  * 
  */
-void task_terminated(void)
+void __attribute__((weak)) task_terminated(void)
 {
     while(1) ;;
 }
