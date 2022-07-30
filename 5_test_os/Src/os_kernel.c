@@ -22,6 +22,7 @@
                                                         // vez que se saca del switching a la tarea.
 #define TASK_RUNNING 		2U                          // estado de running de la tarea esto es cuando se esta ejecutadno
 #define PRIO_MAX  			4U
+#define schedule()			SCB->ICSR = SCB_ICSR_PENDSVSET_Msk
 //este stack es reservado
 uint32_t 					tcb_stack_a[MAX_TASKS+TASK_IDLE][STACKSIZE];  // tcb stack es la memoria que usa el stack en ram.
 static int 					n_tasks = 1;                        // es usado como id de la tarea.
@@ -152,6 +153,7 @@ static int task_list_del(struct task_block **list, struct task_block *act_del)
     }
     return -1;
 }
+
 /**
  * @brief se borra una tarea de las listas activas
  * 
@@ -161,6 +163,14 @@ static int task_list_del(struct task_block **list, struct task_block *act_del)
 static int task_list_del_active(struct task_block *task_to_desact)
 {
     return task_list_del(&task_list_active[task_to_desact->priority], task_to_desact);
+}
+
+static void task_blocking(struct task_block *t)
+{
+    if (task_list_del_active(t) == 0) {
+        task_list_add(&task_list_block[t->priority], t);
+        t->state = TASK_BLOCKED;
+    }
 }
 /**
  * @brief busca entre las tareas ready en las listas.
@@ -182,6 +192,15 @@ static inline struct task_block *task_list_next_ready(struct task_block *t)
             return task_list_active[idx];
     }
     return t;
+}
+
+void task_delay_s(int sec)
+{
+    if (sec < 1)
+        return;
+    t_cur->wakeup_time = sec;
+    task_blocking(t_cur);
+    schedule();
 }
 /**
  * @brief Creamos la tarea del rtos y asignamos stack para la tarea y configuramos los
@@ -268,7 +287,7 @@ void os_init(void){
  */
 void SysTick_Handler(void)
 {
-	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+	schedule();
 	/**
 	 * Instruction Synchronization Barrier; flushes the pipeline and ensures that
 	 * all previous instructions are completed before executing new instructions

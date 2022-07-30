@@ -28,4 +28,5 @@ struct task_block {
 };
 struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, int prio);
 void os_init(void);
+void task_delay_s(int sec);
 #endif /* OS_KERNEL_H_ */
