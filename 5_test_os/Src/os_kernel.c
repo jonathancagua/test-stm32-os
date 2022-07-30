@@ -23,9 +23,9 @@
 #define TASK_RUNNING 		2U                          // estado de running de la tarea esto es cuando se esta ejecutadno
 #define PRIO_MAX  			4U
 //este stack es reservado
-uint32_t 			tcb_stack_a[MAX_TASKS][STACKSIZE];  // tcb stack es la memoria que usa el stack en ram.
+uint32_t 			tcb_stack_a[MAX_TASKS+TASK_IDLE][STACKSIZE];  // tcb stack es la memoria que usa el stack en ram.
 static int 			n_tasks = 1;                        // es usado como id de la tarea.
-static struct 		task_block TASKS[MAX_TASKS];        // bloque de variables usadas.
+static struct 		task_block TASKS[MAX_TASKS+TASK_IDLE];        // bloque de variables usadas.
 
 struct task_block 	*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
 static struct task_block *t_cur = NULL;
@@ -140,7 +140,7 @@ struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, 
     int i;
 
     if (n_tasks > MAX_TASKS) return NULL;       // verificamos que no lleguemos al maximo de las tareas
-    t = &TASKS[n_tasks - 1];                    // asigno al puntero la tarea que le toca
+    t = &TASKS[n_tasks];                    // asigno al puntero la tarea que le toca
     t->id = n_tasks++;                          // incrementamos el contador de tarea.
     for (i = 0; i < TASK_NAME_MAX_LEN; i++) {   // codigo para asignar el nombre de la tarea.
         t->name[i] = name[i];
@@ -151,7 +151,7 @@ struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, 
     t->start = start;                           // agregamos el puntero a la funcion
     t->arg = arg;                               // agregamos el argumento
     t->wakeup_time = 0;                         // seteamos en cero el wake up
-    t->sp = &tcb_stack_a[(t->id)-1][STACKSIZE]; // como el stack pointer es el maximo valor del stack lo asignamos y x eso se usa stacksize
+    t->sp = &tcb_stack_a[t->id][STACKSIZE]; // como el stack pointer es el maximo valor del stack lo asignamos y x eso se usa stacksize
     t->priority = prio;
     task_stack_init(t);                         // hacemos un init de los registro de respaldo.
     task_list_add_active(t);        // agregamos a la lista la tarea.

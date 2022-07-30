@@ -12,6 +12,7 @@
 
 #define TASK_NAME_MAX_LEN   16U                     // maximo d del len del nombre
 #define MAX_TASKS			3U                      // maximo de tareas a usar.
+#define TASK_IDLE			1U
 #define STACKSIZE			100U                    // tamaño asignado al stack, y es quemado a cada tarea de 
                                                     // manera estatica y no dinamica.
 struct task_block {
