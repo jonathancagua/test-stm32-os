@@ -23,12 +23,13 @@
 #define TASK_RUNNING 		2U                          // estado de running de la tarea esto es cuando se esta ejecutadno
 #define PRIO_MAX  			4U
 //este stack es reservado
-uint32_t 			tcb_stack_a[MAX_TASKS+TASK_IDLE][STACKSIZE];  // tcb stack es la memoria que usa el stack en ram.
-static int 			n_tasks = 1;                        // es usado como id de la tarea.
-static struct 		task_block TASKS[MAX_TASKS+TASK_IDLE];        // bloque de variables usadas.
-
-struct task_block 	*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
-static struct task_block *t_cur = NULL;
+uint32_t 					tcb_stack_a[MAX_TASKS+TASK_IDLE][STACKSIZE];  // tcb stack es la memoria que usa el stack en ram.
+static int 					n_tasks = 1;                        // es usado como id de la tarea.
+static struct 				task_block TASKS[MAX_TASKS+TASK_IDLE];        // bloque de variables usadas.
+#define idle 				TASKS[0]
+struct task_block 			*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
+struct task_block 			*task_list_block[PRIO_MAX] = { };	// puntero de las listas bloqueadas.
+static struct task_block 	*t_cur = NULL;
 
 /**
  * @brief este es usado como el frame que se va respalda
@@ -48,6 +49,15 @@ struct extra_frame {
 };
 // sacamos el tamaño del extra frame
 #define extra_frame_size  sizeof(struct extra_frame) / sizeof(uint32_t)
+/**
+ * @brief tarea  usada cuando todas esten bloqueadas. no debe ser llamada por usuario para hacer una tarea
+ * 
+ */
+void __attribute__((weak)) task_idle(void)  {
+	while(1)  {
+		__WFI();
+	}
+}
 /**
  * @brief usado para debug de errores del os
  *
@@ -97,18 +107,67 @@ static void task_stack_init(struct task_block *t)
     exf = (struct extra_frame *)(t->sp);        // puntero a extra frame
     exf->lr_prev_value = 0xFFFFFFF9;            // retornar a modo thread con MSP, FPU no utilizada
 }
-
+/**
+ * @brief Se agrega el puntero de task_block al puntero de la lista de tareas
+ * 
+ * @param list la lista de task_block. 
+ * @param el la task_block que se va agregar.
+ */
 static void task_list_add(struct task_block **list, struct task_block *el)
 {
     el->next = *list;
     *list = el;
 }
-
+/**
+ * @brief funcion usada para agregar la tarea a las listas activas.
+ * 
+ * @param el la tarea que se va agregar.
+ */
 static void task_list_add_active(struct task_block *el)
 {
     task_list_add(&task_list_active[el->priority], el);
 }
 
+/**
+ * @brief funcion para borrar la tarea de la lista
+ * 
+ * @param list lista de tareas
+ * @param act_del tarea a eliminar
+ * @return int 
+ */
+static int task_list_del(struct task_block **list, struct task_block *act_del)
+{
+    struct task_block *t = *list;
+    struct task_block *p = NULL;
+    while (t) {
+        if (t == act_del) {
+            if (p == NULL)
+                *list = t->next;
+            else
+                p->next = t->next;
+            return 0;
+        }
+        p = t;
+        t = t->next;
+    }
+    return -1;
+}
+/**
+ * @brief se borra una tarea de las listas activas
+ * 
+ * @param task_to_desact tarea a borrar de las activas.
+ * @return int 
+ */
+static int task_list_del_active(struct task_block *task_to_desact)
+{
+    return task_list_del(&task_list_active[task_to_desact->priority], task_to_desact);
+}
+/**
+ * @brief busca entre las tareas ready en las listas.
+ * 
+ * @param t se busca al que sigue en la lista de prioridad
+ * @return struct task_block* retorna al siguiente en la lista de prioridad.
+ */
 static inline struct task_block *task_list_next_ready(struct task_block *t)
 {
 	static int idx = 0;
@@ -121,17 +180,17 @@ static inline struct task_block *task_list_next_ready(struct task_block *t)
             return t->next;
         if (task_list_active[idx])
             return task_list_active[idx];
-
     }
     return t;
 }
 /**
  * @brief Creamos la tarea del rtos y asignamos stack para la tarea y configuramos los
- *        contextos y asignamos el stack a la tarea.
+ *        contextos y asignamos el stack a la tarea. la prioridad debe ser diferente para cada tarea.
  * 
  * @param name el nombre de la tarea.
  * @param start el puntero de la funcion.
  * @param arg el argumento de la funcion.
+ * @param prio la prioridad de la tarea, la cual no se debe repetir. Cada prioridad es unica para cada tarea.
  * @return struct task_block* 
  */
 struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, int prio)
@@ -140,7 +199,7 @@ struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, 
     int i;
 
     if (n_tasks > MAX_TASKS) return NULL;       // verificamos que no lleguemos al maximo de las tareas
-    t = &TASKS[n_tasks];                    // asigno al puntero la tarea que le toca
+    t = &TASKS[n_tasks];                    	// asigno al puntero la tarea que le toca
     t->id = n_tasks++;                          // incrementamos el contador de tarea.
     for (i = 0; i < TASK_NAME_MAX_LEN; i++) {   // codigo para asignar el nombre de la tarea.
         t->name[i] = name[i];
@@ -151,13 +210,28 @@ struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, 
     t->start = start;                           // agregamos el puntero a la funcion
     t->arg = arg;                               // agregamos el argumento
     t->wakeup_time = 0;                         // seteamos en cero el wake up
-    t->sp = &tcb_stack_a[t->id][STACKSIZE]; // como el stack pointer es el maximo valor del stack lo asignamos y x eso se usa stacksize
+    t->sp = &tcb_stack_a[t->id][STACKSIZE]; 	// como el stack pointer es el maximo valor del stack lo asignamos y x eso se usa stacksize
     t->priority = prio;
     task_stack_init(t);                         // hacemos un init de los registro de respaldo.
-    task_list_add_active(t);        // agregamos a la lista la tarea.
+    task_list_add_active(t);        			// agregamos a la lista la tarea.
     return t;
 }
-
+/**
+ * @brief funcion para hacer un init de la tarea idle del os se la pone estado de running para no ejecutar en 
+ * el switch context.
+ * 
+ */
+static void kernel_task_init(){
+    idle.name[0] = 0;
+    idle.id = 0;
+    idle.state = TASK_RUNNING;
+    idle.wakeup_time = 0;
+    idle.priority = 0;
+    idle.start = task_idle;
+    idle.sp = &tcb_stack_a[0][STACKSIZE];
+    task_stack_init(&idle);
+    task_list_add_active(&idle);
+}
 //=========================PARA MANEJO DE SWITCH=======================
 /**
  * @brief Init el tick del core y es configurado con el clock del arm
@@ -167,9 +241,9 @@ static void os_tick_init(void)
 {
 	SysTick->LOAD =  ONE_SEC_LOAD - 1;      // Cargar el numero de ciclos por segundo
 	SysTick->VAL  = 0;                      // Limpiar el Systick
-	SysTick->CTRL  = CTRL_CLCK_SRC;         // seleccionar el clock interno
-	SysTick->CTRL  |= CTRL_TICK_INT;        // activar interrupcion
-	SysTick->CTRL  |= CTRL_ENABLE;          // activar el systick
+	SysTick->CTRL = CTRL_CLCK_SRC;         	// seleccionar el clock interno
+	SysTick->CTRL |= CTRL_TICK_INT;        	// activar interrupcion
+	SysTick->CTRL |= CTRL_ENABLE;          	// activar el systick
 	__enable_irq();                         // activar interrrupcion global
 }
 /**
@@ -185,6 +259,7 @@ void os_init(void){
 	 * NVIC. La cuenta matematica que se observa da la probabilidad mas baja posible.
 	 */
 	NVIC_SetPriority(PendSV_IRQn, (1 << __NVIC_PRIO_BITS)-1);
+	kernel_task_init();						// init de la tarea idle
 }
 /**
  * @brief es el handler del tick, para ejecuatar se debe llama rprimero a la funcion os_tick_init

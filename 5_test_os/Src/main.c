@@ -38,8 +38,9 @@ void task3(void *arg)
 {
 	int j;
 	int k;
+	uint32_t valor = *((uint32_t *)arg);
 	while (1) {
-		j++;
+		j += valor ;
 		k++;
 	}
 }
@@ -50,12 +51,13 @@ int main(void)
 	struct task_block *task_block2;
 	struct task_block *task_block3;
 
+	uint32_t valor = 32;
 	led_init();
 	uart_tx_init();
 	os_init();
 	task_block1 = task_create("tarea1", task1, NULL,1);
 	task_block2 = task_create("tarea2", task2, NULL,2);
-	task_block3 = task_create("tarea3", task3, NULL,3);
+	task_block3 = task_create("tarea3", task3, (void *)&valor,3);
     /* Loop forever */
 
 	while (1) {
