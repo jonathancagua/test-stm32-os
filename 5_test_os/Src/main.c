@@ -20,6 +20,7 @@ void task1(void *arg)
 	int k;
 	while (1) {
 		i++;
+		task_delay_s(10);
 		k++;
 	}
 }

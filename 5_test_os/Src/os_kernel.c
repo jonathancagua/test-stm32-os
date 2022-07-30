@@ -165,10 +165,23 @@ static int task_list_del_active(struct task_block *task_to_desact)
     return task_list_del(&task_list_active[task_to_desact->priority], task_to_desact);
 }
 
+static int task_list_del_block(struct task_block *task_to_act)
+{
+    return task_list_del(&task_list_block[task_to_act->priority], task_to_act);
+}
+
 static void task_blocking(struct task_block *t)
 {
     if (task_list_del_active(t) == 0) {
         task_list_add(&task_list_block[t->priority], t);
+        t->state = TASK_BLOCKED;
+    }
+}
+
+static void task_ready(struct task_block *t)
+{
+    if (task_list_del_block(t) == 0) {
+    	task_list_add_active(t);
         t->state = TASK_BLOCKED;
     }
 }
@@ -192,6 +205,20 @@ static inline struct task_block *task_list_next_ready(struct task_block *t)
             return task_list_active[idx];
     }
     return t;
+}
+
+static void task_list_block_tick()
+{
+    for(int i=PRIO_MAX-1;i>=0;i--){
+    	struct task_block *t = task_list_block[i];
+    	if(t->start != NULL){
+    		t->wakeup_time--;
+    		if(t->wakeup_time <= 0){
+    			task_ready(t);
+    		}
+    	}
+
+    }
 }
 
 void task_delay_s(int sec)
@@ -287,6 +314,7 @@ void os_init(void){
  */
 void SysTick_Handler(void)
 {
+	task_list_block_tick();
 	schedule();
 	/**
 	 * Instruction Synchronization Barrier; flushes the pipeline and ensures that
