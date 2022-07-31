@@ -20,6 +20,9 @@ void task1(void *arg)
 	int k;
 	while (1) {
 		i++;
+		led_on();
+		task_delay_s(3);
+		led_off();
 		task_delay_s(3);
 		k++;
 	}
@@ -43,6 +46,7 @@ void task3(void *arg)
 	uint32_t valor = *((uint32_t *)arg);
 	while (1) {
 		j += valor ;
+		task_delay_s(20);
 		k++;
 	}
 }

@@ -27,6 +27,7 @@
 uint32_t 					tcb_stack_a[MAX_TASKS+TASK_IDLE][STACKSIZE];  // tcb stack es la memoria que usa el stack en ram.
 static int 					n_tasks = 1;                        // es usado como id de la tarea.
 static struct 				task_block TASKS[MAX_TASKS+TASK_IDLE];        // bloque de variables usadas.
+#define idle_index			0U
 #define idle 				TASKS[0]
 struct task_block 			*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
 struct task_block 			*task_list_block[PRIO_MAX] = { };	// puntero de las listas bloqueadas.
@@ -128,7 +129,11 @@ static void task_list_add_active(struct task_block *el)
 {
     task_list_add(&task_list_active[el->priority], el);
 }
-
+/**
+ * @brief funcion para agregar a la tarea a la lista de bloqueadas
+ * 
+ * @param el la tarea a bloquear
+ */
 static void task_list_add_block(struct task_block *el)
 {
     task_list_add(&task_list_block[el->priority], el);
@@ -138,7 +143,7 @@ static void task_list_add_block(struct task_block *el)
  * 
  * @param list lista de tareas
  * @param act_del tarea a eliminar
- * @return int 
+ * @return int -1 si es q no encuentra la tarea
  */
 static int task_list_del(struct task_block **list, struct task_block *act_del)
 {
@@ -168,12 +173,21 @@ static int task_list_del_active(struct task_block *task_to_desact)
 {
     return task_list_del(&task_list_active[task_to_desact->priority], task_to_desact);
 }
-
+/**
+ * @brief borra una tarea de la lista de bloqueadas
+ * 
+ * @param task_to_act tarea a eliminar de bloqueadas
+ * @return int retorna -1 si es q no encuentra la tarea
+ */
 static int task_list_del_block(struct task_block *task_to_act)
 {
     return task_list_del(&task_list_block[task_to_act->priority], task_to_act);
 }
-
+/**
+ * @brief recibe la tarea a bloquear y cambia su estado
+ * 
+ * @param t la tarea a bloquear.
+ */
 static void task_blocking(struct task_block *t)
 {
     if (task_list_del_active(t) == 0) {
@@ -181,7 +195,12 @@ static void task_blocking(struct task_block *t)
         t->state = TASK_BLOCKED;
     }
 }
-
+/**
+ * @brief cambia a ready la tarea y la borra de lista de bloqueadas. 
+ * Activa la tarea
+ * 
+ * @param t la tarea a poner ready
+ */
 static void task_ready(struct task_block *t)
 {
     if (task_list_del_block(t) == 0) {
@@ -190,17 +209,31 @@ static void task_ready(struct task_block *t)
     }
 }
 /**
- * @brief busca entre las tareas ready en las listas.
+ * @brief cuenta la cantidad de tareas activas
+ * 
+ * @return int retorna el numero de tareas
+ */
+static int task_active_n(){
+	int cnt = 0;
+	for (int i = PRIO_MAX-1; i > 0; i--) {
+		if(task_list_active[i]) cnt++;
+	}
+	return cnt;
+}
+
+/**
+ * @brief busca entre las tareas ready en las listas o
+ * se retorna la del idle si es q ninguna tarea esta ready.
  * 
  * @param t se busca al que sigue en la lista de prioridad
  * @return struct task_block* retorna al siguiente en la lista de prioridad.
  */
 static inline struct task_block *task_list_next_ready(struct task_block *t)
 {
-	static int idx = 0;
-	while(1){
+	static int idx = PRIO_MAX;
+	while(task_active_n()>0){
 		idx--;
-		if(idx<0) idx = PRIO_MAX;
+		if(idx<=0) idx = PRIO_MAX-1;
         if ((idx == t->priority) &&
                 (t->next != NULL) &&
                 (t->next->state == TASK_READY))
@@ -208,9 +241,12 @@ static inline struct task_block *task_list_next_ready(struct task_block *t)
         if (task_list_active[idx])
             return task_list_active[idx];
     }
-    return t;
+    return task_list_active[idle_index];//retorno el kernel en caso que todas las tareas esten bloqueadas no exista tareas
 }
-
+/**
+ * @brief usado para decrementar un tick a las tareas bloqueada.
+ * 
+ */
 static void task_list_block_tick()
 {
     for(int i=PRIO_MAX-1;i>=0;i--){
@@ -224,7 +260,11 @@ static void task_list_block_tick()
 
     }
 }
-
+/**
+ * @brief funcion de retardo y bloquea la tarea para dar paso a la sigueinte.
+ * 
+ * @param sec tiempo en segundo a estar bloqueada.
+ */
 void task_delay_s(int sec)
 {
     if (sec < 1)
