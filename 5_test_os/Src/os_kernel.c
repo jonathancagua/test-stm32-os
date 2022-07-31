@@ -129,6 +129,10 @@ static void task_list_add_active(struct task_block *el)
     task_list_add(&task_list_active[el->priority], el);
 }
 
+static void task_list_add_block(struct task_block *el)
+{
+    task_list_add(&task_list_block[el->priority], el);
+}
 /**
  * @brief funcion para borrar la tarea de la lista
  * 
@@ -173,7 +177,7 @@ static int task_list_del_block(struct task_block *task_to_act)
 static void task_blocking(struct task_block *t)
 {
     if (task_list_del_active(t) == 0) {
-        task_list_add(&task_list_block[t->priority], t);
+    	task_list_add_block(t);
         t->state = TASK_BLOCKED;
     }
 }
@@ -182,7 +186,7 @@ static void task_ready(struct task_block *t)
 {
     if (task_list_del_block(t) == 0) {
     	task_list_add_active(t);
-        t->state = TASK_BLOCKED;
+        t->state = TASK_READY;
     }
 }
 /**
