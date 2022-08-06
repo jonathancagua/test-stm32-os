@@ -251,7 +251,7 @@ static void task_list_block_tick()
 {
     for(int i=PRIO_MAX-1;i>=0;i--){
     	struct task_block *t = task_list_block[i];
-    	if(t->start != NULL){
+    	if((t->start != NULL) && (t-> wakeup_time > 0)){
     		t->wakeup_time--;
     		if(t->wakeup_time <= 0){
     			task_ready(t);
@@ -259,6 +259,18 @@ static void task_list_block_tick()
     	}
 
     }
+}
+
+void semaphore_take(struct semaphore *sem){
+	if(!sem)return;
+	sem->task_sem = t_cur;
+	task_blocking(t_cur);
+	schedule();
+}
+
+void semaphore_give(struct semaphore *sem){
+	if(!sem)return;
+	task_ready(sem->task_sem);
 }
 /**
  * @brief funcion de retardo y bloquea la tarea para dar paso a la sigueinte.

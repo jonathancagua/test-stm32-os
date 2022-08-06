@@ -9,6 +9,7 @@
 #define OS_KERNEL_H_
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #define TASK_NAME_MAX_LEN   16U                     // maximo d del len del nombre
 #define MAX_TASKS			3U                      // maximo de tareas a usar.
@@ -26,7 +27,15 @@ struct task_block {
     uint32_t            wakeup_time;			    // el de despertar
     uint8_t 			priority;
 };
+
+struct semaphore {
+	struct task_block 	*task_sem;
+	bool 				take;
+};
+
 struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, int prio);
 void os_init(void);
 void task_delay_s(int sec);
+void semaphore_take(struct semaphore *sem);
+void semaphore_give(struct semaphore *sem);
 #endif /* OS_KERNEL_H_ */

@@ -13,7 +13,7 @@
 #include "led.h"
 #include "uart.h"
 #include "os_kernel.h"
-
+struct semaphore sem_task2;
 void task1(void *arg)
 {
 	int i;
@@ -34,7 +34,8 @@ void task2(void *arg)
 	int k;
 	while (1) {
 		j++;
-		task_delay_s(10);
+		semaphore_take(&sem_task2);
+		printf("task2 ejecutando \n\r");
 		k++;
 	}
 }
@@ -46,7 +47,8 @@ void task3(void *arg)
 	uint32_t valor = *((uint32_t *)arg);
 	while (1) {
 		j += valor ;
-		task_delay_s(20);
+		task_delay_s(10);
+		semaphore_give(&sem_task2);
 		k++;
 	}
 }
