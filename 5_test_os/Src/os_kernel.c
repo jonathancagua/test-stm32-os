@@ -29,6 +29,10 @@ static int 					n_tasks = 1;                        // es usado como id de la ta
 static struct 				task_block TASKS[MAX_TASKS+TASK_IDLE];        // bloque de variables usadas.
 #define idle_index			0U
 #define idle 				TASKS[0]
+#define queue_len_validate(S) (S->write_index + 1 <= S->data_max)? true:false
+#define queue_empty(q) (q->idx_write == q->idx_read)? true:false
+#define queue_full(q) ( (q->idx_write + 1) % q->data_max == q->idx_read) ? true:false
+
 struct task_block 			*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
 struct task_block 			*task_list_block[PRIO_MAX] = { };	// puntero de las listas bloqueadas.
 static struct task_block 	*t_cur = NULL;
@@ -261,9 +265,49 @@ static void task_list_block_tick()
     }
 }
 
+void queue_init(struct queue *queue_os, uint16_t data_size){
+	queue_os->data_size = data_size;
+	queue_os->idx_write = 0;
+	queue_os->idx_read = 0;
+	queue_os->task_queue = NULL;
+	queue_os->data_max = QUEUE_SIZE/data_size;
+}
+
+void queue_write(struct queue* queue_os, void* data){
+	//pasamos la tarea a un estado de desbloqueo, ya que estaba esperando dato de la cola
+	if((queue_empty(queue_os)) && (queue_os->task_queue != NULL)){
+		task_ready(queue_os->task_queue);
+	}
+	while((queue_os->idx_write + 1) % queue_os->data_max == queue_os->idx_read){
+		task_blocking(t_cur);
+		queue_os->task_queue = t_cur;
+		schedule();
+	}
+	memcpy(queue_os->data+(queue_os->idx_write * queue_os->data_size),data,queue_os->data_size);
+	queue_os->idx_write = (queue_os->idx_write + 1) % queue_os->data_max;
+	queue_os->task_queue = NULL;
+}
+
+void queue_read(struct queue* queue_os, void* data){
+	//pasamos la tarea a un estado de desbloqueo, ya que estaba esperando dato de la cola
+	if((queue_full(queue_os)) && (queue_os->task_queue != NULL)){
+		task_ready(queue_os->task_queue);
+	}
+	while(queue_os->idx_write  == queue_os->idx_read){
+		task_blocking(t_cur);
+		queue_os->task_queue = t_cur;
+		schedule();
+	}
+	memcpy(data,queue_os->data+(queue_os->idx_read * queue_os->data_size),queue_os->data_size);
+	queue_os->idx_read = (queue_os->idx_read + 1) % queue_os->data_max;
+	queue_os->task_queue = NULL;
+
+}
+
 void semaphore_take(struct semaphore *sem){
 	if(!sem)return;
 	sem->task_sem = t_cur;
+	sem->take = true;
 	task_blocking(t_cur);
 	schedule();
 }

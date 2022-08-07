@@ -16,6 +16,7 @@
 #define TASK_IDLE			1U
 #define STACKSIZE			100U                    // tamaño asignado al stack, y es quemado a cada tarea de 
                                                     // manera estatica y no dinamica.
+#define QUEUE_SIZE			64U
 struct task_block {
     uint32_t            *sp;					    // el stack pointer
     struct task_block   *next;		                // la tarea q sigue
@@ -33,9 +34,20 @@ struct semaphore {
 	bool 				take;
 };
 
+struct queue {
+	uint8_t 			data[QUEUE_SIZE];
+	struct task_block 	*task_queue;
+	uint16_t 			idx_read;
+	uint16_t 			idx_write;
+	uint16_t 			data_size;
+	uint16_t 			data_max;
+};
+
 struct task_block *task_create(char *name, void (*start)(void *arg), void *arg, int prio);
 void os_init(void);
 void task_delay_s(int sec);
 void semaphore_take(struct semaphore *sem);
 void semaphore_give(struct semaphore *sem);
+void queue_write(struct queue* queue_os, void* data);
+void queue_init(struct queue *queue_os, uint16_t data_size);
 #endif /* OS_KERNEL_H_ */
