@@ -4,7 +4,7 @@
 // Resultado: q7: dec: 17 hex: 0x11 float:0.13281250000000000000
 // el valor fue truncado el resultado era 0x1180 pero fue dejado 0x11 lo cual cambia su valor
 // al que el realmente se debia obtener.
-
+#ifdef app2
 #include "arm_math.h"
 //#include "arm_const_structs.h"
 #include "2_app.h"
@@ -52,3 +52,4 @@ void app2_main( void ) {
       HAL_Delay(10000);
    }
 }
+#endif

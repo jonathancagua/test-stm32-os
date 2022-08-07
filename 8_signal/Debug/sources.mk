@@ -24,4 +24,14 @@ SUBDIRS := \
 Core/Src \
 Core/Startup \
 Drivers/STM32L4xx_HAL_Driver/Src \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/BasicMathFunctions \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/CommonTables \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/ComplexMathFunctions \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/ControllerFunctions \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/FastMathFunctions \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/FilteringFunctions \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/MatrixFunctions \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/StatisticsFunctions \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/SupportFunctions \
+Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Source/TransformFunctions \
 

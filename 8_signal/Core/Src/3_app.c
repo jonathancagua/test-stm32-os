@@ -4,6 +4,7 @@
  *  Created on: Jul 16, 2022
  *      Author: dev_fw
  */
+#ifdef ejemp3
 #include "arm_math.h"
 //#include "arm_const_structs.h"
 #include "3_app.h"
@@ -31,13 +32,13 @@ struct header_struct {
 } header={"head",0,128,10000,0,0,0,0,0,"tail"};
 
 
-uint32_t cyclesCounterRead( void );
-void cyclesCounterReset( void );
-void cyclesCounterInit( void );
-uint32_t adcRead();
-void dacWrite(uint16_t value);
+static uint32_t cyclesCounterRead( void );
+static void cyclesCounterReset( void );
+static void cyclesCounterInit( void );
+static uint32_t adcRead();
+static void dacWrite(uint16_t value);
 
-void trigger(int16_t threshold)
+static void trigger(int16_t threshold)
 {
    while((adcRead()-512)>threshold)
       ;
@@ -78,27 +79,27 @@ void app3_main(){
 }
 //---------------SACADO DE LA EDU CIAA-------------
 
-uint32_t cyclesCounterRead( void ){
+static uint32_t cyclesCounterRead( void ){
    return DWT->CYCCNT;
 }
 
-void cyclesCounterReset( void ){
+static void cyclesCounterReset( void ){
    //resetea el contador de ciclos de clock
 	DWT->CYCCNT = 0;
 }
 
-void cyclesCounterInit( void ){
+static void cyclesCounterInit( void ){
    //resetea el contador de ciclos de clock
 	DWT->CTRL |= 1;
 }
 
-void dacWrite(uint16_t value){
+static void dacWrite(uint16_t value){
 
 	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, value);
 	HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
 }
 
-uint32_t adcRead()
+static uint32_t adcRead()
 {
   uint32_t ADCValue = 0;
   HAL_ADC_Start(&hadc2);
@@ -109,3 +110,4 @@ uint32_t adcRead()
 
   return ADCValue;
 }
+#endif

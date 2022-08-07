@@ -1,13 +1,28 @@
-21:34:50 **** Incremental Build of configuration Debug for project 8_signal ****
+17:50:38 **** Incremental Build of configuration Debug for project 8_signal ****
 make -j3 all 
-arm-none-eabi-gcc "../Core/Src/3_app.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L475xx -c -I../Core/Inc -I../Drivers/CMSIS/Include -I../Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Include -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/3_app.d" -MT"Core/Src/3_app.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/3_app.o"
+arm-none-eabi-gcc "../Core/Src/class4_1.c" -mcpu=cortex-m4 -std=gnu11 -g3 -D__TARGET_FPU_VFP -D__FPU_PRESENT=1 -DDEBUG -DARM_MATH_CM4 -DUSE_HAL_DRIVER -DSTM32L475xx -c -I../Core/Inc -I../Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Include -I../Drivers/CMSIS/Include -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/class4_1.d" -MT"Core/Src/class4_1.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/class4_1.o"
+In file included from ../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4xx.h:147,
+                 from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h:29,
+                 from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:27,
+                 from ../Core/Inc/stm32l4xx_hal_conf.h:258,
+                 from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:29,
+                 from ../Core/Inc/main.h:30,
+                 from ../Core/Inc/adc.h:29,
+                 from ../Core/Src/class4_1.c:10:
+../Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l475xx.h:51: warning: "__FPU_PRESENT" redefined
+   51 | #define __FPU_PRESENT             1U       /*!< FPU present                                   */
+      | 
+<command-line>: note: this is the location of the previous definition
+../Core/Src/class4_1.c:40:13: warning: 'trigger' defined but not used [-Wunused-function]
+   40 | static void trigger(int16_t threshold)
+      |             ^~~~~~~
 arm-none-eabi-gcc -o "8_signal.elf" @"objects.list"  -l:libarm_cortexM4lf_math.a -mcpu=cortex-m4 -T"/Users/jonathancagua/STM32/test-stm32-os/8_signal/STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="8_signal.map" -Wl,--gc-sections -static -L../Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Lib/GCC --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: 8_signal.elf
  
 arm-none-eabi-size   8_signal.elf 
 arm-none-eabi-objdump -h -S  8_signal.elf  > "8_signal.list"
    text	   data	    bss	    dec	    hex	filename
-  40268	    520	   2048	  42836	   a754	8_signal.elf
+  33996	    484	   2044	  36524	   8eac	8_signal.elf
 Finished building: default.size.stdout
  
 Finished building: 8_signal.list
