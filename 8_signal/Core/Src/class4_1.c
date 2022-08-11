@@ -280,3 +280,38 @@ static uint32_t adcRead()
 
   return ADCValue;
 }
+
+/* arm_rfft_init_f32 es la función utilizada para inicializar la configuración del algoritmo. Los parámetros &S y &S_CFFT son
+estructuras globales que utiliza la función para almacenar los  valores  de  configuración,  FFT_LENGTH  determina
+la longitud de la FFT, los valores admitidos son 128, 512 o 2048. ifftFlag  y  doBitReverse  son  banderas  binarias
+que determinan si se realiza una transformación directa (FFT) o inversa (IFFT), y si la salida está en orden normal o en orden de bit invertido. */
+
+//arm_rfft_init_f32(&S,  &S_CFFT,  FFT_LENGTH, ifftFlag, doBitReverse);
+
+/* arm_rfft_f32 es la función encargada de realizar la FFT. El  parámetro  &S  es  la  estructura  global  utilizada
+en  la función antes mencionada. FFT_DATA_IN es el arreglo de tipo float32_t y de longitud FFT_LENGTH que contiene
+los datos  de  la  señal  muestreada.  FFT_CMPLX_DATA  es  el arreglo de tipo float32_t y de longitud FFT_LENGTH*2
+que contiene los datos resultantes de la transformada. El arreglo resultante es el doble de tamaño del arreglo de
+entrada porque los datos están en formato rectangular (real e imaginario).*/
+
+
+//arm_rfft_f32(&S, FFT_DATA_IN, FFT_CMPLX_DATA);
+
+/*
+arm_cmplx_mag_f32 es la función que convierte los datos del  arreglo  FFT_CMPLX_DATA  de  rectangular  a
+ polar (magnitud  y  fase),  y  almacena  únicamente  los  valores  de magnitud en FFT_MAG_DATA, que es un arreglo
+ de tipo float32_t  y  de  longitud  FFT_LENGTH.  Debido  a  la naturaleza  del  algoritmo  para  realizar  la  transformada,
+ los datos  en  el  arreglo  FFT_MAG_DATA  se  encuentran reflejados, siendo útiles FFT_LENGTH / 2. El  algoritmo  se  configuró
+ para  trabajar  con FFT_LENGTH igual a 512 datos, y frecuencia de muestreo configurable. */
+
+//arm_cmplx_mag_f32(FFT_CMPLX_DATA,  FFT_MAG_DATA, FFT_LENGTH);
+
+/*R es  la resolución  de la FFT (Eq. 1  y Eq. 2), FS es  la frecuencia de muestreo y FN es la frecuencia de Nyquist.
+FN es  equivalente  a  la  mitad  de  la  frecuencia  de  muestreo  y aparece como FMAX en la Fig. 4.
+Puede ser modificada por el  usuario  dentro  de  una  gama  de  frecuencias  antes mencionadas.
+Como  los  datos  útiles  son  la  mitad  de FFT_LENGTH,  la  resolución  se  calcula  de  la  siguiente manera:
+
+R = (Fs)/FFT_length = Fs/512
+R = (Fs/2)/(FFT_length/2) = Fn/256
+
+*/
