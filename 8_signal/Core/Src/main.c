@@ -111,7 +111,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	class1_main();
+	class3_1_main();
 	HAL_Delay(1000);
   }
   /* USER CODE END 3 */

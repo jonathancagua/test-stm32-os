@@ -178,6 +178,75 @@ void class2_main(){
 	}
 
 }
+
+void class3_1_main(){
+	uint16_t sample = 0;
+	arm_rfft_instance_q15 S;
+	q15_t fftIn [ header.N	   ];// guarda copia de samples en Q15 como in para la fft.La fft corrompe los datos de la entrada!
+	q15_t fftOut[ header.N *2   ];	// salida de la fft
+	q15_t fftMag[ header.N /2+1 ]; // magnitud de la FFT
+	int16_t adc [ header.N	   ];
+	cyclesCounterInit();
+	while(1) {
+		cyclesCounterReset();
+		HAL_UART_Transmit(&huart1, (uint8_t* )&adc[sample], sizeof(adc[0]), 1);
+		HAL_UART_Transmit(&huart1, (uint8_t* )&fftOut[sample*2],sizeof(fftOut[0]), 1);// envia la fft del sample ANTERIO
+		HAL_UART_Transmit(&huart1, (uint8_t* )&fftOut[sample*2+1],sizeof(fftOut[0]), 1);// envia la fft del sample ANTERIO
+		adc[sample]       = (((int16_t )adcRead()-512)>>(10-BITS))<<(6+10-BITS);
+		fftIn[sample]   = adc[sample];
+
+		if ( ++sample==header.N ) {
+			sample = 0;
+			//------------TRANSFORMADA------------------
+			arm_rfft_init_q15		   	( &S		,header.N	  ,0				,1				  ); // inicializa una estructira que usa la funcion fft para procesar los datos. Notar el /2 para el largo
+			arm_rfft_q15			   	( &S		,fftIn		  ,fftOut							  ); // ejecuta la rfft REAL fft
+			arm_cmplx_mag_squared_q15 	( fftOut 	,fftMag		  ,header.N/2+1						  );
+			arm_max_q15			   		( fftMag 	,header.N/2+1 ,&header.maxValue ,&header.maxIndex );
+
+			header.id++;
+			HAL_UART_Transmit(&huart1, (uint8_t* )&header, sizeof(struct header_struct ), 1);
+
+		}
+		while(cyclesCounterRead() < NUCLEO_CLOCK_SPEED/header.fs) // el clk de la nucleo es 80M
+		;
+	}
+
+}
+
+void class3_2_main(){
+	uint16_t sample = 0;
+	arm_rfft_instance_f32 S;
+	arm_cfft_radix4_instance_f32  cS;
+	float fftIn [ header.N      ]; // guarda copia de samples en Q15 como in para la fft.La fft corrompe los datos de la entrada!
+	float fftOut[ header.N *2   ]; // salida de la fft
+	float adc [ header.N        ];
+	cyclesCounterInit();
+	while(1) {
+		int16_t adcRaw;
+		cyclesCounterReset();
+		HAL_UART_Transmit(&huart1, (uint8_t* )&adc[sample], sizeof(adc[0]), 1);
+		HAL_UART_Transmit(&huart1, (uint8_t* )&fftOut[sample*2],sizeof(fftOut[0]), 1);// envia la fft del sample ANTERIO
+		HAL_UART_Transmit(&huart1, (uint8_t* )&fftOut[sample*2+1],sizeof(fftOut[0]), 1);// envia la fft del sample ANTERIO
+		adcRaw      = adcRead()-512;
+		adc[sample]   = adcRaw/512.0;            // PISA el sample que se acaba de mandar con una nueva muestra
+		fftIn[sample] = adcRaw;
+
+		if ( ++sample==header.N ) {
+			sample = 0;
+			//------------TRANSFORMADA------------------
+			arm_rfft_init_f32 ( &S ,&cS   ,header.N ,0 ,1 ); // inicializa una estructira que usa la funcion fft para procesar los datos. Notar el /2 para el largo
+			arm_rfft_f32      ( &S ,fftIn ,fftOut         ); // por fin.. ejecuta la rfft REAL fft
+
+			header.id++;
+			HAL_UART_Transmit(&huart1, (uint8_t* )&header, sizeof(struct header_struct ), 1);
+
+		}
+		while(cyclesCounterRead() < NUCLEO_CLOCK_SPEED/header.fs) // el clk de la nucleo es 80M
+		;
+	}
+
+}
+
 //---------------SACADO DE LA EDU CIAA-------------
 
 static uint32_t cyclesCounterRead( void ){
