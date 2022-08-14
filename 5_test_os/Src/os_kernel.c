@@ -36,6 +36,7 @@ static struct 				task_block TASKS[MAX_TASKS+TASK_IDLE];        // bloque de var
 struct task_block 			*task_list_active[PRIO_MAX] = { };	// puntero de las listas activas.
 struct task_block 			*task_list_block[PRIO_MAX] = { };	// puntero de las listas bloqueadas.
 static struct task_block 	*t_cur = NULL;
+static void* 				isr_vector[FPU_IRQn];
 
 /**
  * @brief este es usado como el frame que se va respalda
@@ -264,7 +265,12 @@ static void task_list_block_tick()
 
     }
 }
-
+/**
+ * @brief funcion para inicializar la cola.
+ * 
+ * @param queue_os puntero a la cola.
+ * @param data_size tamanio de la cola.
+ */
 void queue_init(struct queue *queue_os, uint16_t data_size){
 	queue_os->data_size = data_size;
 	queue_os->idx_write = 0;
@@ -272,7 +278,12 @@ void queue_init(struct queue *queue_os, uint16_t data_size){
 	queue_os->task_queue = NULL;
 	queue_os->data_max = QUEUE_SIZE/data_size;
 }
-
+/**
+ * @brief Funcion para escribir en cola
+ * 
+ * @param queue_os cola donde voy a escribir
+ * @param data dato a escribir.
+ */
 void queue_write(struct queue* queue_os, void* data){
 	//pasamos la tarea a un estado de desbloqueo, ya que estaba esperando dato de la cola
 	if((queue_empty(queue_os)) && (queue_os->task_queue != NULL)){
@@ -287,7 +298,12 @@ void queue_write(struct queue* queue_os, void* data){
 	queue_os->idx_write = (queue_os->idx_write + 1) % queue_os->data_max;
 	queue_os->task_queue = NULL;
 }
-
+/**
+ * @brief leer de la cola la variable almacenada
+ * 
+ * @param queue_os cola que se va leer.
+ * @param data dato de la cola.
+ */
 void queue_read(struct queue* queue_os, void* data){
 	//pasamos la tarea a un estado de desbloqueo, ya que estaba esperando dato de la cola
 	if((queue_full(queue_os)) && (queue_os->task_queue != NULL)){
@@ -303,7 +319,11 @@ void queue_read(struct queue* queue_os, void* data){
 	queue_os->task_queue = NULL;
 
 }
-
+/**
+ * @brief se toma el semaforo y se bloquea otra tarea que dependa del mismo
+ * 
+ * @param sem semaforo a tomar
+ */
 void semaphore_take(struct semaphore *sem){
 	if(!sem)return;
 	sem->task_sem = t_cur;
@@ -311,7 +331,11 @@ void semaphore_take(struct semaphore *sem){
 	task_blocking(t_cur);
 	schedule();
 }
-
+/**
+ * @brief semaforo a dar, desbloquea la tarea que dependa del mismo
+ * 
+ * @param sem el semaforo a dar
+ */
 void semaphore_give(struct semaphore *sem){
 	if(!sem)return;
 	task_ready(sem->task_sem);
@@ -443,8 +467,14 @@ uint32_t get_next_context(uint32_t sp_actual)  {
 	t_cur = task_list_next_ready(t_cur);
 	return t_cur->sp;
 }
-static void* isr_vector[FPU_IRQn];
-
+/**
+ * @brief Funcion para subscribir una funcion a la interrupcion. 
+ * 
+ * @param irq es el id de la interrupcion
+ * @param ptr_func funcion donde se desea saltar.
+ * @return true si fue atachado la funcion.
+ * @return false no fue atachado la funcion.
+ */
 bool os_irq_subscribe(IRQn_Type irq, void* ptr_func){
 	bool resp = false;
 	if (isr_vector[irq] == NULL) {
@@ -455,7 +485,13 @@ bool os_irq_subscribe(IRQn_Type irq, void* ptr_func){
 	}
 	return resp;
 }
-
+/**
+ * @brief la funcion desuscribe la interrupcion
+ * 
+ * @param irq el id de la interrupcion
+ * @return true si se desuscribe
+ * @return false no se encontro la funcion atachada.
+ */
 bool os_irq_unsubscribe(IRQn_Type irq){
 	bool resp = false;
 
@@ -468,7 +504,11 @@ bool os_irq_unsubscribe(IRQn_Type irq){
 
 	return resp;
 }
-
+/**
+ * @brief funcion donde saltaran todas las interrupciones y ve a q funcion saltar
+ * 
+ * @param IRQn es el id de la interrupcion
+ */
 static void os_irq_handler(IRQn_Type IRQn){
 	void (*funcion_usuario)(void);
 	funcion_usuario = isr_vector[IRQn];

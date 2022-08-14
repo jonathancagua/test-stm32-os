@@ -51,7 +51,7 @@ PendSV_Handler:
 	* el resultado de la operacion sera cero, y la bandera Z = 1, por lo que se da la condicion EQ y
 	* se hace el push de los registros de FPU restantes
 	*/
-
+	cpsid i				//disable interrupts global
 	tst lr,0x10
 	it eq
 	vpusheq {s16-s31}
@@ -71,5 +71,6 @@ PendSV_Handler:
 	tst lr,0x10
 	it eq
 	vpopeq {s16-s31}
+	cpsie i				//enable interrupts global
 	bx lr					//se hace un branch indirect con el valor de LR que es nuevamente EXEC_RETURN
 
