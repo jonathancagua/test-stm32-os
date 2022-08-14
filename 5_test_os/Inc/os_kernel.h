@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-
+#include "stm32l4xx.h"
 #define TASK_NAME_MAX_LEN   16U                     // maximo d del len del nombre
 #define MAX_TASKS			3U                      // maximo de tareas a usar.
 #define TASK_IDLE			1U
@@ -50,4 +50,5 @@ void semaphore_take(struct semaphore *sem);
 void semaphore_give(struct semaphore *sem);
 void queue_write(struct queue* queue_os, void* data);
 void queue_init(struct queue *queue_os, uint16_t data_size);
+bool os_irq_subscribe(IRQn_Type irq, void* ptr_func);
 #endif /* OS_KERNEL_H_ */

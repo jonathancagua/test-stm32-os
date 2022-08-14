@@ -443,3 +443,33 @@ uint32_t get_next_context(uint32_t sp_actual)  {
 	t_cur = task_list_next_ready(t_cur);
 	return t_cur->sp;
 }
+static void* isr_vector[FPU_IRQn];
+
+bool os_irq_subscribe(IRQn_Type irq, void* ptr_func)  {
+	bool resp = 0;
+	if (isr_vector[irq] == NULL) {
+		isr_vector[irq] = ptr_func;
+		NVIC_ClearPendingIRQ(irq);
+		NVIC_EnableIRQ(irq);
+		resp = true;
+	}
+	return resp;
+}
+
+static void os_irq_handler(IRQn_Type IRQn){
+	void (*funcion_usuario)(void);
+	funcion_usuario = isr_vector[IRQn];
+	NVIC_ClearPendingIRQ(IRQn);
+	funcion_usuario();
+
+}
+
+void RCC_IRQHandler  (void){ os_irq_handler(RCC_IRQn);}		/* RCC global interrupt                                                */
+void EXTI0_IRQHandler(void){ os_irq_handler(EXTI0_IRQn);}		/* EXTI Line 0 interrupt                                               */
+void EXTI1_IRQHandler(void){ os_irq_handler(EXTI1_IRQn);}		/* EXTI Line 1 interrupt                                               */
+void EXTI2_IRQHandler(void){ os_irq_handler(EXTI2_IRQn);}		/* EXTI Line 2 interrupt                                               */
+void EXTI3_IRQHandler(void){ os_irq_handler(EXTI3_IRQn);}		/* EXTI Line 3 interrupt                                               */
+void EXTI4_IRQHandler(void){ os_irq_handler(EXTI4_IRQn);}		/* EXTI Line4 interrupt                                                */
+void EXTI15_10_IRQHandler(void){os_irq_handler(EXTI15_10_IRQn);}// EXTI Lines 10 to 15 interrupts
+
+

@@ -16,6 +16,7 @@
 #include "button.h"
 struct semaphore sem_task2;
 struct queue queue_task1;
+volatile uint32_t 			button_presses = 0;
 void task1(void *arg)
 {
 	int i=0;
@@ -53,11 +54,17 @@ void task3(void *arg)
 	while (1) {
 		j += valor ;
 		task_delay_s(1);
+		printf("Boton presionado %d veces \n\r",button_presses);
 		//semaphore_give(&sem_task2);
 		k++;
 	}
 }
 
+void boton_handler(void)
+{
+	EXTI->PR1 = (uint32_t) (BUTTON_PIN);// se debe deshabilitar en el pin q es
+	button_presses++;
+}
 int main(void)
 {
 	struct task_block *task_block1;
@@ -68,13 +75,12 @@ int main(void)
 	led_init();
 	uart_tx_init();
 	button_init();
-//	os_init();
-//	task_block1 = task_create("tarea1", task1, NULL,1);
-//	task_block2 = task_create("tarea2", task2, NULL,2);
-//	task_block3 = task_create("tarea3", task3, (void *)&valor,3);
-//	queue_init(&queue_task1, sizeof(uint32_t));
-    /* Loop forever */
-
+	os_init();
+	task_block1 = task_create("tarea1", task1, NULL,1);
+	task_block2 = task_create("tarea2", task2, NULL,2);
+	task_block3 = task_create("tarea3", task3, (void *)&valor,3);
+	queue_init(&queue_task1, sizeof(uint32_t));
+	os_irq_subscribe(EXTI15_10_IRQn,boton_handler);
 	while (1) {
 	}
 }

@@ -5,12 +5,8 @@
  *      Author: jonathancagua
  */
 #include "button.h"
-
-#define PIN					13U			//se selcciona el pin
 #define MODE_REG			2U			//para usar con el registro de set
 #define GPIOCEN				(1U<<2)		//para activar el port c
-#define BUTTON_PIN			(1U<<PIN)	//se desplaza para selccion el pin
-volatile uint32_t 			button_presses = 0;
 
 void button_init(void)
 {
@@ -28,14 +24,10 @@ void button_init(void)
 	EXTI->PR1 		= (BUTTON_PIN);
 
 	NVIC_SetPriority(EXTI15_10_IRQn,0);
-	NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
-
-
-void EXTI15_10_IRQHandler(void)
-{
-	EXTI->PR1 = (uint32_t) (BUTTON_PIN);
-	button_presses++;
-}
+//void EXTI15_10_IRQHandler(void)
+//{
+//	EXTI->PR1 = (uint32_t) (BUTTON_PIN);
+//}
