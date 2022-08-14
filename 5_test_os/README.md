@@ -1,6 +1,6 @@
 # materia de sistemas operativos.
 ## Kit usado
-El kit usado es B-L475E-IOT01A1.
+El kit usado es B-L475E-IOT01A1.<br>
 ![plot](img/b-l475e.jpg)
 ## Ide usado
 Se usa STM32CubeIDE y CMSIS directo sin librerias HAL.
