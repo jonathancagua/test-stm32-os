@@ -13,6 +13,7 @@
 #include "led.h"
 #include "uart.h"
 #include "os_kernel.h"
+#include "button.h"
 struct semaphore sem_task2;
 struct queue queue_task1;
 void task1(void *arg)
@@ -66,11 +67,12 @@ int main(void)
 	uint32_t valor = 32;
 	led_init();
 	uart_tx_init();
-	os_init();
-	task_block1 = task_create("tarea1", task1, NULL,1);
-	task_block2 = task_create("tarea2", task2, NULL,2);
-	task_block3 = task_create("tarea3", task3, (void *)&valor,3);
-	queue_init(&queue_task1, sizeof(uint32_t));
+	button_init();
+//	os_init();
+//	task_block1 = task_create("tarea1", task1, NULL,1);
+//	task_block2 = task_create("tarea2", task2, NULL,2);
+//	task_block3 = task_create("tarea3", task3, (void *)&valor,3);
+//	queue_init(&queue_task1, sizeof(uint32_t));
     /* Loop forever */
 
 	while (1) {

@@ -10,6 +10,5 @@
 
 
 void class1_main();
-void class3_1_main();
-void class3_2_main();
+
 #endif /* INC_1_APP_H_ */

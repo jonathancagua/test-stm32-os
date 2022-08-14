@@ -4,6 +4,7 @@
  *  Created on: Jul 16, 2022
  *      Author: dev_fw
  */
+#define app1
 #ifdef app1
 #include "arm_math.h"
 #include "arm_const_structs.h"
@@ -17,7 +18,9 @@ struct header_struct {
    uint16_t N;
    uint16_t fs ;
    char     tail[4];
-} header={"head",0,256,5000,"tail"};
+}__attribute__ ((packed));
+
+static struct header_struct header={"head",0,256,5000,"tail"};
 
 uint32_t cyclesCounterRead( void );
 void cyclesCounterReset( void );

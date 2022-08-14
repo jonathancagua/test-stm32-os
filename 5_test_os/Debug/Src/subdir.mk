@@ -5,6 +5,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Src/button.c \
 ../Src/led.c \
 ../Src/main.c \
 ../Src/os_kernel.c \
@@ -18,6 +19,7 @@ S_UPPER_SRCS += \
 
 OBJS += \
 ./Src/PendSV_Handler.o \
+./Src/button.o \
 ./Src/led.o \
 ./Src/main.o \
 ./Src/os_kernel.o \
@@ -30,6 +32,7 @@ S_UPPER_DEPS += \
 ./Src/PendSV_Handler.d 
 
 C_DEPS += \
+./Src/button.d \
 ./Src/led.d \
 ./Src/main.d \
 ./Src/os_kernel.d \
@@ -48,7 +51,7 @@ Src/%.o Src/%.su: ../Src/%.c Src/subdir.mk
 clean: clean-Src
 
 clean-Src:
-	-$(RM) ./Src/PendSV_Handler.d ./Src/PendSV_Handler.o ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/os_kernel.d ./Src/os_kernel.o ./Src/os_kernel.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/timebase.d ./Src/timebase.o ./Src/timebase.su ./Src/uart.d ./Src/uart.o ./Src/uart.su
+	-$(RM) ./Src/PendSV_Handler.d ./Src/PendSV_Handler.o ./Src/button.d ./Src/button.o ./Src/button.su ./Src/led.d ./Src/led.o ./Src/led.su ./Src/main.d ./Src/main.o ./Src/main.su ./Src/os_kernel.d ./Src/os_kernel.o ./Src/os_kernel.su ./Src/syscalls.d ./Src/syscalls.o ./Src/syscalls.su ./Src/sysmem.d ./Src/sysmem.o ./Src/sysmem.su ./Src/timebase.d ./Src/timebase.o ./Src/timebase.su ./Src/uart.d ./Src/uart.o ./Src/uart.su
 
 .PHONY: clean-Src
 

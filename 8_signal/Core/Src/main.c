@@ -27,7 +27,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 //#include "arm_math.h"
-#include "class4_1.h"
+#include "class3.h"
+#include "test_fft.h"
+#include "1_app.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,8 +113,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	class3_1_main();
-	HAL_Delay(1000);
+	//class3_1_main();
+	  //test_main();
+	  app1_main();
+	  HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
