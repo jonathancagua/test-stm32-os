@@ -445,14 +445,27 @@ uint32_t get_next_context(uint32_t sp_actual)  {
 }
 static void* isr_vector[FPU_IRQn];
 
-bool os_irq_subscribe(IRQn_Type irq, void* ptr_func)  {
-	bool resp = 0;
+bool os_irq_subscribe(IRQn_Type irq, void* ptr_func){
+	bool resp = false;
 	if (isr_vector[irq] == NULL) {
 		isr_vector[irq] = ptr_func;
 		NVIC_ClearPendingIRQ(irq);
 		NVIC_EnableIRQ(irq);
 		resp = true;
 	}
+	return resp;
+}
+
+bool os_irq_unsubscribe(IRQn_Type irq){
+	bool resp = false;
+
+	if (isr_vector[irq] != NULL) {
+		isr_vector[irq] = NULL;
+		NVIC_ClearPendingIRQ(irq);
+		NVIC_DisableIRQ(irq);
+		resp = true;
+	}
+
 	return resp;
 }
 

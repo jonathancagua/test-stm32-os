@@ -51,4 +51,5 @@ void semaphore_give(struct semaphore *sem);
 void queue_write(struct queue* queue_os, void* data);
 void queue_init(struct queue *queue_os, uint16_t data_size);
 bool os_irq_subscribe(IRQn_Type irq, void* ptr_func);
+bool os_irq_unsubscribe(IRQn_Type irq);
 #endif /* OS_KERNEL_H_ */
