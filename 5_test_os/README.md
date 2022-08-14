@@ -1,4 +1,7 @@
 # materia de sistemas operativos.
+Sistema Operativo desarrollado para la materia "Implementacion de sistemas operativos I"
+
+Este sistema operativo tiene fines solamente didacticos, no es recomendable para utilizarlo en produccion de dispositivos y o productos.
 ## Kit usado
 El kit usado es B-L475E-IOT01A1.<br>
 ![plot](img/b-l475e.jpg)
