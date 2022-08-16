@@ -30,7 +30,7 @@ struct header_struct {
    char		pos[4];
 } __attribute__ ((packed));
 
-static struct header_struct header={"head",0,128,2000,0,0,"tail"};
+static struct header_struct header={"head",0,128,8000,0,0,"tail"};
 static uint32_t cyclesCounterRead( void );
 static void cyclesCounterReset( void );
 static void cyclesCounterInit( void );
@@ -74,6 +74,7 @@ void DrawBar(uint16_t bottomX, uint16_t bottomY, uint16_t maxHeight, uint16_t ma
 
 
 int main_project( void ) {
+	char buffer[50];
 	FILE * fp;
    uint16_t sample = 0;
    arm_rfft_instance_q15 S;
@@ -81,7 +82,7 @@ int main_project( void ) {
    q15_t fftOut[ header.N *2   ];	// salida de la fft
    q15_t fftMag[ header.N /2+1 ]; // magnitud de la FFT
    int16_t adc [ header.N	   ];
-
+   q15_t color[3];
    cyclesCounterInit ( );
 
    while(1) {
@@ -107,6 +108,12 @@ int main_project( void ) {
 		 //		 trigger(2);
 		 header.id++;
 		 int i=0;
+		 int red = 22;
+		 int green =22;
+		 color[0]=0;
+		 color[1]=0;
+		 color[2]=0;
+
 		for (i = 1; i < (header.N /2+1); i++) {
 			/* Draw FFT results */
 //			DrawBar(30 + 2 * i,
@@ -117,10 +124,19 @@ int main_project( void ) {
 //					0x1234,
 //					0xFFFF
 //			);
-			printf ("$%d;", fftMag[(uint16_t)i]);
+			//printf ("$%d;", fftMag[(uint16_t)i]);
+			if(i<red) color[0] += fftMag[(uint16_t)i];
+			else if((red<i) && (i<red+green)) color[1] += fftMag[(uint16_t)i];
+			else color[2] += fftMag[(uint16_t)i];
+
+			//printf ("$%d;", fftMag[(uint16_t)i]);
+
 			//HAL_UART_Transmit(&huart1, "$", 1, 1);
 
 		}
+		//printf ("$%d %d %d;", color[0],color[1],color[2]);
+		int size_data = snprintf(buffer, 50, "$%d %d %d;", color[0],color[1],color[2]);
+		HAL_UART_Transmit(&huart1,buffer, size_data, 1);
 		 //uartWriteByteArray ( UART_USB ,(uint8_t*)&header ,sizeof(struct header_struct ));
 
 		 //		 for(int i=0;i<header.N;i++) {

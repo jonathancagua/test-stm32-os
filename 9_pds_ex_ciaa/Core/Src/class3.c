@@ -22,17 +22,16 @@ uint16_t sweept = 5;
  int16_t offset = 512;
  int16_t zero = 0;
 
- struct header_struct {
-    char     pre[4];
-    uint32_t id;
-    uint16_t N;
-    uint16_t fs ;
-    uint32_t maxIndex; // indexador de maxima energia por cada fft
-    q15_t maxValue;    // maximo valor de energia del bin por cada fft
-    char     pos[4];
- } __attribute__ ((packed));
+struct header_struct {
+   char     pre[8];
+   uint32_t id;
+   uint16_t N;
+   uint16_t fs ;
+   uint16_t hLength ;
+   char     pos[4];
+} __attribute__ ((packed)); //importante para que no paddee
 
- static struct header_struct header={"head",0,128,10000,0,0,"tail"};
+static struct header_struct header={"*header*",0,256,8000,h_LENGTH,"end*"};
 
 static uint32_t cyclesCounterRead( void );
 static void cyclesCounterReset( void );
@@ -50,67 +49,34 @@ static void trigger(int16_t threshold)
 }
 
 
-//void class3_1_main(){
-//   uint16_t sample = 0;
-//   int16_t adc   [ header.N            ];
-//   int16_t y     [ h_LENGTH+header.N-1 ]; //
-//   cyclesCounterInit();
-//   while(1) {
-//      cyclesCounterReset();
-//
-//      adc[sample]       = (((int16_t )adcRead()-512)>>(10-BITS))<<(6+10-BITS);          // PISA el sample que se acaba de mandar con una nueva muestra
-//      if ( ++sample==header.N ) {
-//         sample = 0;
-////------------CONVOLUCION------------------
-//         arm_conv_fast_q15  ( adc,header.N,h,h_LENGTH,y); //126+74-1
-////------------ENVIO DE TRAMA------------------
-//         header.id++;
-//         HAL_UART_Transmit(&huart1,(uint8_t*)&header ,sizeof(struct header_struct ),1);
-//         for (int i=0;i<(header.N+h_LENGTH-1 );i++) {
-//        	 HAL_UART_Transmit(&huart1,(uint8_t* )(i<header.N?&adc[i]:&offset ),sizeof(adc[0]),1);
-//        	 HAL_UART_Transmit(&huart1,(uint8_t* )(i<h_LENGTH?&h  [i]:&zero   ),sizeof(h[0])  ,1);
-//        	 HAL_UART_Transmit(&huart1,(uint8_t* )(           &y  [i]         ),sizeof(y[0])  ,1);
-//         }
-//      }
-//
-//      while(cyclesCounterRead()< NUCLEO_CLOCK_SPEED/header.fs) // el clk de la CIAA es 204000000
-//         ;
-//   }
-//}
+void class3_1_main(){
+   uint16_t sample = 0;
+   int16_t adc   [ header.N            ];
+   int16_t y     [ h_LENGTH+header.N-1 ]; //
+   cyclesCounterInit();
+   while(1) {
+      cyclesCounterReset();
 
-void class3_2_main(){
-	uint16_t sample = 0;
-	arm_rfft_instance_f32 S;
-	arm_cfft_radix4_instance_f32  cS;
-	float fftIn [ header.N      ]; // guarda copia de samples en Q15 como in para la fft.La fft corrompe los datos de la entrada!
-	float fftOut[ header.N *2   ]; // salida de la fft
-	float adc [ header.N        ];
-	cyclesCounterInit();
-	while(1) {
-		int16_t adcRaw;
-		cyclesCounterReset();
-		HAL_UART_Transmit(&huart1, (uint8_t* )&adc[sample], sizeof(adc[0]), 1);
-		HAL_UART_Transmit(&huart1, (uint8_t* )&fftOut[sample*2],sizeof(fftOut[0]), 1);// envia la fft del sample ANTERIO
-		HAL_UART_Transmit(&huart1, (uint8_t* )&fftOut[sample*2+1],sizeof(fftOut[0]), 1);// envia la fft del sample ANTERIO
-		adcRaw      = adcRead()-2048.0;
-		adc[sample]   = adcRaw/2048.0;            // PISA el sample que se acaba de mandar con una nueva muestra
-		fftIn[sample] = adcRaw;
+      adc[sample]       = (((int16_t )adcRead()-512)>>(10-BITS))<<(6+10-BITS);          // PISA el sample que se acaba de mandar con una nueva muestra
+      if ( ++sample==header.N ) {
+         sample = 0;
+//------------CONVOLUCION------------------
+         arm_conv_fast_q15  ( adc,header.N,h,h_LENGTH,y); //126+74-1
+//------------ENVIO DE TRAMA------------------
+         header.id++;
+         HAL_UART_Transmit(&huart1,(uint8_t*)&header ,sizeof(struct header_struct ),1);
+         for (int i=0;i<(header.N+h_LENGTH-1 );i++) {
+        	 HAL_UART_Transmit(&huart1,(uint8_t* )(i<header.N?&adc[i]:&offset ),sizeof(adc[0]),1);
+        	 HAL_UART_Transmit(&huart1,(uint8_t* )(i<h_LENGTH?&h  [i]:&zero   ),sizeof(h[0])  ,1);
+        	 HAL_UART_Transmit(&huart1,(uint8_t* )(           &y  [i]         ),sizeof(y[0])  ,1);
+         }
+      }
 
-		if ( ++sample==header.N ) {
-			sample = 0;
-			//------------TRANSFORMADA------------------
-			arm_rfft_init_f32 ( &S ,&cS   ,header.N ,0 ,1 ); // inicializa una estructira que usa la funcion fft para procesar los datos. Notar el /2 para el largo
-			arm_rfft_f32      ( &S ,fftIn ,fftOut         ); // por fin.. ejecuta la rfft REAL fft
-
-			header.id++;
-			HAL_UART_Transmit(&huart1, (uint8_t* )&header, sizeof(struct header_struct ), 1);
-
-		}
-		while(cyclesCounterRead() < NUCLEO_CLOCK_SPEED/header.fs) // el clk de la nucleo es 80M
-		;
-	}
-
+      while(cyclesCounterRead()< NUCLEO_CLOCK_SPEED/header.fs) // el clk de la CIAA es 204000000
+         ;
+   }
 }
+
 //---------------SACADO DE LA EDU CIAA-------------
 
 static uint32_t cyclesCounterRead( void ){
