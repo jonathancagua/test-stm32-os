@@ -30,6 +30,8 @@
 #include "class3.h"
 #include "test_fft.h"
 #include "1_app.h"
+#include "project.h"
+#include "arm_math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,6 +63,17 @@ void PeriphCommonClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static uint32_t adcRead()
+{
+  uint32_t ADCValue = 0;
+  HAL_ADC_Start(&hadc2);
+  if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK) {
+      ADCValue = HAL_ADC_GetValue(&hadc2);
+  }
+  HAL_ADC_Stop(&hadc2);
+
+  return ADCValue;
+}
 
 /* USER CODE END 0 */
 
@@ -72,6 +85,8 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	uint32_t ADCValue = 0;
+	float32_t Input_adc;
+	uint32_t Input_adc_2;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -101,8 +116,7 @@ int main(void)
   MX_ADC3_Init();
   MX_DAC1_Init();
   /* USER CODE BEGIN 2 */
-
-  HAL_UART_Transmit(&huart1, "hola", 5, 1);
+ // HAL_UART_Transmit(&huart1, "hola", 5, 1);
   //app1_main();
   /* USER CODE END 2 */
 
@@ -115,8 +129,12 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	//class3_1_main();
 	  //test_main();
-	  app1_main();
-	  HAL_Delay(1000);
+	  //app1_main();
+	  //Input_adc = (float32_t)((float32_t)adcRead()- (float32_t)2048.0) / (float32_t)2048.0;
+	  Input_adc_2 = adcRead();
+	  //class3_2_main();
+	  main_project();
+	  HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
