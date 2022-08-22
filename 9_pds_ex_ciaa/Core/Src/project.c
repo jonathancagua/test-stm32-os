@@ -52,26 +52,12 @@ static void trigger(int16_t threshold)
 	  ;
    return;
 }
-/* Draw bar for LCD */
-/* Simple library to draw bars */
-void DrawBar(uint16_t bottomX, uint16_t bottomY, uint16_t maxHeight, uint16_t maxValue, float32_t value, uint16_t foreground, uint16_t background) {
-	uint16_t height;
-	height = (uint16_t)((float32_t)value / (float32_t)maxValue * (float32_t)maxHeight);
-	if (height == maxHeight) {
-		//printf("maximo valor");
-		//dibujo el maximo
-		//TM_ILI9341_DrawLine(bottomX, bottomY, bottomX, bottomY - height, foreground);
-	} else if (height < maxHeight) {
-		//printf("valor menor");
-		//dibujo el restante
-		//TM_ILI9341_DrawLine(bottomX, bottomY, bottomX, bottomY - height, foreground);
-		//TM_ILI9341_DrawLine(bottomX, bottomY - height, bottomX, bottomY - maxHeight, background);
-	}
-	else {
-		printf("imprimo mayor");
-	}
-}
 
+void DrawData(uint16_t *color) {
+	char buffer[50];
+	int size_data = snprintf(buffer, 50, "$%d %d %d;", color[0],color[1],color[2]);
+	HAL_UART_Transmit(&huart1,buffer, size_data, 1);
+}
 
 int main_project( void ) {
 	char buffer[50];
@@ -88,16 +74,8 @@ int main_project( void ) {
    while(1) {
 	  cyclesCounterReset();
 
-	  //uartWriteByteArray ( UART_USB ,(uint8_t* )&adc[sample]		,sizeof(adc[0]) );	 // envia el sample ANTERIOR
-	  //uartWriteByteArray ( UART_USB ,(uint8_t* )&fftOut[sample*2]	,sizeof(fftOut[0])); // envia la fft del sample ANTERIO
-	  //uartWriteByteArray ( UART_USB ,(uint8_t* )&fftOut[sample*2+1] ,sizeof(fftOut[0])); // envia la fft del sample ANTERIO
 	  adc[sample]	= (((int16_t )adcRead()-512)>>(10-BITS))<<(6+10-BITS);			 // PISA el sample que se acaba de mandar con una nueva muestra
-	  //adc[sample]	= ((int16_t )adcRead()-2048);
 	  fftIn[sample] = adc[sample];														 // copia del adc porque la fft corrompe el arreglo de entrada
-	  //float t=((tick%(sweept*header.fs))/(float)header.fs);
-	  //tick++;
-	  //dacWrite( DAC, 512*arm_sin_f32 (t*B/2*(t/sweept)*2*PI)+512); // sweept
-	  //dacWrite( DAC, 512*arm_sin_f32 (t*tone*2*PI)+512);		 // tono
 	  if ( ++sample==header.N ) {
 		 sample = 0;
 		 arm_rfft_init_q15		   ( &S		,header.N	  ,0				,1				  ); // inicializa una estructira que usa la funcion fft para procesar los datos. Notar el /2 para el largo
@@ -110,41 +88,28 @@ int main_project( void ) {
 		 int i=0;
 		 int red = 22;
 		 int green =22;
-		 color[0]=0;
-		 color[1]=0;
-		 color[2]=0;
+
 
 		for (i = 1; i < (header.N /2+1); i++) {
-			/* Draw FFT results */
-//			DrawBar(30 + 2 * i,
-//					220,
-//					120,//grosor maximo
-//					(uint16_t)header.maxValue,
-//					(float32_t)fftMag[(uint16_t)i],
-//					0x1234,
-//					0xFFFF
-//			);
-			//printf ("$%d;", fftMag[(uint16_t)i]);
+
 			if(i<red) color[0] += fftMag[(uint16_t)i];
 			else if((red<i) && (i<red+green)) color[1] += fftMag[(uint16_t)i];
 			else color[2] += fftMag[(uint16_t)i];
-
-			//printf ("$%d;", fftMag[(uint16_t)i]);
-
-			//HAL_UART_Transmit(&huart1, "$", 1, 1);
+#ifdef plot_mag_fft
+			int size_data = snprintf(buffer, 50, "$%d;", fftMag[(uint16_t)i]);
+			HAL_UART_Transmit(&huart1,buffer, size_data, 1);
+#endif
 
 		}
-		//printf ("$%d %d %d;", color[0],color[1],color[2]);
+#ifdef plot_fft
 		int size_data = snprintf(buffer, 50, "$%d %d %d;", color[0],color[1],color[2]);
 		HAL_UART_Transmit(&huart1,buffer, size_data, 1);
-		 //uartWriteByteArray ( UART_USB ,(uint8_t*)&header ,sizeof(struct header_struct ));
+#endif
+		color[0] /= red;
+		color[1] /= green;
+		color[2] /= ((header.N / 2+1) - red -green);
+		DrawData(color);
 
-		 //		 for(int i=0;i<header.N;i++) {
-		 //			uartWriteByteArray ( UART_USB ,(uint8_t* )&adc[i]	,sizeof(adc[0]) );	 // envia el sample ANTERIOR
-		 //			uartWriteByteArray ( UART_USB ,(uint8_t* )&fftOut[i*2] ,sizeof(fftOut[0])); // envia la fft del sample ANTERIO
-		 //			uartWriteByteArray ( UART_USB ,(uint8_t* )&fftOut[i*2+1] ,sizeof(fftOut[0])); // envia la fft del sample ANTERIO
-		 //		 }
-		 //adcRead(CH1); //why?? hay algun efecto minimo en el 1er sample.. puede ser por el blinkeo de los leds o algo que me corre 10 puntos el primer sample. Con esto se resuelve.. habria que investigar el problema en detalle
 	  }
       while(cyclesCounterRead()< NUCLEO_CLOCK_SPEED/header.fs) // el clk de la CIAA es 204000000
          ;
