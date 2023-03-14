@@ -54,6 +54,7 @@ void task3(void *arg)
 	while (1) {
 		j += valor ;
 		task_delay_s(1);
+		printf("task3 valor pasado: %d \n\r",valor);
 		printf("Boton presionado %d veces \n\r",button_presses);
 		//semaphore_give(&sem_task2);
 		k++;
