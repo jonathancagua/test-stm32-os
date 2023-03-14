@@ -27,9 +27,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 //#include "arm_math.h"
-#include "class3.h"
-#include "test_fft.h"
-#include "1_app.h"
 #include "project.h"
 #include "arm_math.h"
 /* USER CODE END Includes */

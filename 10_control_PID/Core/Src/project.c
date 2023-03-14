@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include "arm_math.h"
 #include "arm_const_structs.h"
-#include "class3.h"
 #include "adc.h"
 #include "dac.h"
 #include "usart.h"
