@@ -31,6 +31,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "arm_math.h" //<< si usas esto agregar ARM_MATH_CM4
+							//__FPU_PRESENT=1
+							//__TARGET_FPU_VFP en config
 #include "pidTask.h"
 /* USER CODE END Includes */
 
@@ -64,6 +67,7 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+//arm_matrix_instance_f32 E;      // Error(k) = y(k) - aux4 -> 1 x 1
 
 /* USER CODE END 0 */
 
@@ -122,11 +126,11 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Init scheduler */
-  //osKernelInitialize();  /* Call init function for freertos objects (in freertos.c) */
-  //MX_FREERTOS_Init();
+  osKernelInitialize();  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init();
 
   /* Start scheduler */
-  //osKernelStart();
+  osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
