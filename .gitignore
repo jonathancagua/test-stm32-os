@@ -53,3 +53,9 @@ STM32Cube_FW_L4_V1.17.0/
 10_control_PID/chip_headers/CMSIS/RTOS
 10_control_PID/chip_headers/CMSIS/RTOS2
 10_control_PID/chip_headers/CMSIS/docs
+
+test_rtos_pid/chip_headers/CMSIS/DSP
+test_rtos_pid/chip_headers/CMSIS/NN
+test_rtos_pid/chip_headers/CMSIS/RTOS
+test_rtos_pid/chip_headers/CMSIS/RTOS2
+test_rtos_pid/chip_headers/CMSIS/docs

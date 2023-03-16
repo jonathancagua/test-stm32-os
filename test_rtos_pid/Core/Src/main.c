@@ -64,19 +64,7 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void job2 (void const *argument)  {              // thread function 'job2'
-  while (1)   {
-	  osDelay (20);                                           // execute some code
-  }
-}
 
-osThreadDef(job2, osPriorityNormal, 1, 0);       // define job2 as thread function
-
-void job3 (void const *argument)  {              // thread function 'job3'
-  while (1)   {
-    osDelay (20);                                // delay execution for 20 milliseconds
-  }
-}
 /* USER CODE END 0 */
 
 /**
