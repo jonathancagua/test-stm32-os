@@ -11,6 +11,7 @@
 #include "adc.h"
 #include "dac.h"
 #include "usart.h"
+#include "app_adc.h"
 /*=====[Inclusions of private function dependencies]=========================*/
 
 #include "pid_controller.h"
@@ -37,23 +38,7 @@
 
 // Para calcular el tiempo que tarda el algoritmo y establecer un h minimo
 //#define COUNT_CYCLES
-static void dacWrite(uint16_t value){
 
-	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, value);
-	HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
-}
-
-static uint32_t adcRead()
-{
-  uint32_t ADCValue = 0;
-  HAL_ADC_Start(&hadc2);
-  if (HAL_ADC_PollForConversion(&hadc2, 1000000) == HAL_OK) {
-      ADCValue = HAL_ADC_GetValue(&hadc2);
-  }
-  HAL_ADC_Stop(&hadc2);
-
-  return ADCValue;
-}
 // Task implementation
 void pidControlTask( void* taskParmPtr )
 {
@@ -104,8 +89,8 @@ void pidControlTask( void* taskParmPtr )
       #endif
 
       // Leer salida y[k] y refererencia r[k]
-      y = adcRead() * SCALE_Y;
-      r = adcRead() * SCALE_R;
+      y = adcRead(&hadc1) * SCALE_Y;
+      r = adcRead(&hadc2) * SCALE_R;
 
       // Calculate PID controller output u[k]
       u = pidCalculateControllerOutput( &PsPIDController, y, r ) * SCALE_U;

@@ -35,6 +35,10 @@
 							//__FPU_PRESENT=1
 							//__TARGET_FPU_VFP en config
 #include "pidTask.h"
+#include "identification_ls.h"
+#include "identification_rls.h"
+#include "identification_tasks.h"
+#include "app_adc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,6 +48,19 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define PID
+// Noise signal limits
+#define DAC_REFERENCE_VALUE_HIGH   666  // 1023 = 3.3V, 666 = 2.15V
+#define DAC_REFERENCE_VALUE_LOW    356  // 1023 = 3.3V, 356 = 1.15V
+#define ADC0_CH_Y       3
+
+//#define getVoltsSampleFrom(adc0Channel) 3.3*(float)adcRead((adc0Channel))/1023.0
+
+static StackType_t taskIdentificationStack[configMINIMAL_STACK_SIZE*15];
+static StaticTask_t taskIdentificationTCB;
+
+t_IRLSdata* tIRLS1;
+t_ILSdata* tILS1;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -62,13 +79,41 @@ void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
-
+void receiveData (float* buffer);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 //arm_matrix_instance_f32 E;      // Error(k) = y(k) - aux4 -> 1 x 1
+// Generación del DAC y captura del ADC
 
+
+static float getVoltsSampleFrom(ADC_HandleTypeDef *ptr_hadc) {
+	return (3.3*(float)adcRead(ptr_hadc)/1023.0);
+}
+
+void receiveData (float* buffer)
+{
+    float Y, U;
+
+    uint16_t dacValue = 0;
+
+    // random = limite_inferior + rand() % (limite_superior +1 - limite_inferior);
+    dacValue = DAC_REFERENCE_VALUE_LOW + rand() % (DAC_REFERENCE_VALUE_HIGH+1 - DAC_REFERENCE_VALUE_LOW);
+
+    dacWrite( dacValue );
+
+    // Need at least 2.5 us to uptate DAC.
+    //delayInaccurateUs(5);
+
+    // dacSample = (1023.0 / 3.3) * sampleInVolts
+    // 1023.0 / 3.3 = 310.0
+    U = (float) dacValue * 3.3 / 1023.0;
+	Y = (float) getVoltsSampleFrom( &hadc2 );
+
+	buffer[0] = U;
+	buffer[1] = Y;
+}
 /* USER CODE END 0 */
 
 /**
@@ -114,6 +159,7 @@ int main(void)
   MX_DAC1_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+#ifdef PID
   xTaskCreate(
      pidControlTask,                 // Function that implements the task.
      (const char *)"pidControlTask", // Text name for the task.
@@ -122,6 +168,34 @@ int main(void)
      tskIDLE_PRIORITY+1,             // Priority at which the task is created.
      0                               // Pointer to the task created in the system
   );
+#else
+#ifdef ILS
+	tILS1 = (t_ILSdata*) pvPortMalloc (sizeof(t_ILSdata));
+  	ILS_Init(tILS1, 50, 10, receiveData);
+
+	xTaskCreateStatic(
+	  ILS_Task,                   // task function
+	  "Identification Task",      // human-readable neame of task
+	  configMINIMAL_STACK_SIZE,   // task stack size
+	  (void*)tILS1,               // task parameter (cast to void*)
+	  tskIDLE_PRIORITY+1,         // task priority
+	  taskIdentificationStack,    // task stack (StackType_t)
+	  &taskIdentificationTCB      // pointer to Task TCB (StaticTask_t)
+	);
+#else
+	tIRLS1 = (t_IRLSdata*) pvPortMalloc (sizeof(t_IRLSdata));
+	IRLS_Init(tIRLS1, 10, receiveData);
+	xTaskCreateStatic(
+	   IRLS_Task,                  // task function
+	   "Identification Task",      // human-readable neame of task
+	   configMINIMAL_STACK_SIZE,   // task stack size
+	   (void*)tIRLS1,              // task parameter (cast to void*)
+	   tskIDLE_PRIORITY+1,         // task priority
+	   taskIdentificationStack,    // task stack (StackType_t)
+	   &taskIdentificationTCB      // pointer to Task TCB (StaticTask_t)
+	);
+#endif
+#endif
   vTaskStartScheduler(); // Initialize scheduler
   /* USER CODE END 2 */
 
