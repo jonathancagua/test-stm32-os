@@ -51,13 +51,13 @@ void ILS_Task (void* taskParmPtr)
 	{
         // Ejecuto el Identificador
         ILS_Run(tILS);
-
+#ifdef console
         if(tILS->i==2)
         {
             // Imprimo los parámetros calculados
             console_print(tILS->buffer_T);
         }
-
+#endif
 		vTaskDelayUntil( &xLastWakeTime, ( tILS->ts_Ms / portTICK_RATE_MS ) );
 	}
 }
