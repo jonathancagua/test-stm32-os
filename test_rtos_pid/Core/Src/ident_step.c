@@ -12,7 +12,7 @@
 #define onda_cuadrada
 static int16_t dacValue = 0;
 
-static void task_generador(void *_) {
+static void task_generador(void *taskParmPtr) {
     TickType_t lastWakeTime = xTaskGetTickCount();
     for (;;) {
 #ifdef onda_cuadrada
@@ -29,7 +29,7 @@ static void task_generador(void *_) {
 }
 
 
-static void task_identification(void *_) {
+static void task_identification(void *taskParmPtr) {
     static uint32_t sample;
     TickType_t lastWakeTime = xTaskGetTickCount();
     for (;;) {
