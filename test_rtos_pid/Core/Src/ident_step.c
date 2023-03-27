@@ -33,7 +33,7 @@ static void task_identification(void *taskParmPtr) {
     static uint32_t sample;
     TickType_t lastWakeTime = xTaskGetTickCount();
     for (;;) {
-    	uint32_t sample = adcRead(&hadc2);
+    	uint32_t sample = adcRead(&hadc1);
     	printf ("%d / %d \r\n", ((uint16_t)sample), ((uint16_t)dacValue));
         vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(1000 / sample_freq));
     }

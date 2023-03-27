@@ -41,7 +41,6 @@
      PA0   ------> UART4_TX
      PA1   ------> UART4_RX
      PA3   ------> S_TIM2_CH4
-     PA5   ------> SPI1_SCK
      PA6   ------> SPI1_MISO
      PA7   ------> SPI1_MOSI
      PD1   ------> SPI2_SCK
@@ -131,8 +130,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
   HAL_GPIO_Init(ARD_D4_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PAPin PAPin PAPin */
-  GPIO_InitStruct.Pin = ARD_D13_Pin|ARD_D12_Pin|ARD_D11_Pin;
+  /*Configure GPIO pins : PAPin PAPin */
+  GPIO_InitStruct.Pin = ARD_D12_Pin|ARD_D11_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
