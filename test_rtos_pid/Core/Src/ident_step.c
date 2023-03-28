@@ -8,7 +8,7 @@
 #include "task.h"
 #include "app_adc.h"
 #define sample_freq 1000
-#define tak_freq 100
+#define tak_freq 5
 #define onda_cuadrada
 static int16_t dacValue = 0;
 
