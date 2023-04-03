@@ -48,7 +48,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define STEP
+#define ILS
 // Noise signal limits
 #define DAC_REFERENCE_VALUE_HIGH   666  // 1023 = 3.3V, 666 = 2.15V
 #define DAC_REFERENCE_VALUE_LOW    356  // 1023 = 3.3V, 356 = 1.15V
@@ -95,16 +95,17 @@ void receiveData(float* buffer) {
     float Y, U;
 
     uint16_t dacValue = 0;
+    uint32_t dac_convert = 0;
 
-    dacValue = rand() % 1024;
-
+    dacValue = rand() % 65535;
+    dac_convert = (dacValue * 996)/65535;//996
     dacWrite(dacValue);
 
-    U = (float)dacValue * 3.3 / 1023.0;
-    uint32_t sample = adcRead(&hadc2);
-    Y = 3.3 * (float)sample / 1023.0;
+    U = (float)dacValue * 3.3 / 65535.0;
+    uint32_t sample = adcRead(&hadc1);
+    Y = 3.3 * (float)sample / 996.0;
 
-    printf ("%d / %d \r\n", ((int16_t)sample), ((int16_t)dacValue));
+    printf ("%d / %d \r\n", ((int16_t)sample), ((int16_t)dac_convert));
 
     buffer[0] = U;
     buffer[1] = Y;
