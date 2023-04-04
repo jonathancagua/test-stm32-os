@@ -100,7 +100,7 @@ void receiveData(float* buffer) {
     dacValue = rand() % 65535;
     dac_convert = (dacValue * 996)/65535;//996
     dacWrite(dacValue);
-
+    vTaskDelay(5);
     U = (float)dacValue * 3.3 / 65535.0;
     uint32_t sample = adcRead(&hadc1);
     Y = 3.3 * (float)sample / 996.0;
