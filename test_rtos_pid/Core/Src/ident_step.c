@@ -9,11 +9,14 @@
 #include "app_adc.h"
 #define sample_freq 1000
 #define tak_freq 5
-#define onda_cuadrada
-static int16_t dacValue = 0;
-
+#define tak_freq_prbs 100
+#//define onda_cuadrada
+static uint16_t dacValue = 0;
+static uint32_t dac_convert = 0;
+uint32_t sample_2 = 0;
 static void task_generador(void *taskParmPtr) {
     TickType_t lastWakeTime = xTaskGetTickCount();
+    srand(time(NULL));
     for (;;) {
 #ifdef onda_cuadrada
     	dacValue ^= 0xFFFF;
@@ -21,9 +24,11 @@ static void task_generador(void *taskParmPtr) {
     	dacWrite(dacValue);
         vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(1000 / tak_freq));
 #else
-    	dacValue = rand() % 1024;
+    	dacValue = rand() % 65535;
+    	dac_convert = (dacValue * 996)/65535;//996
         dacWrite(dacValue);
-        vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(1000 / tak_freq));
+        sample_2 = adcRead(&hadc1);
+        vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(1000 / tak_freq_prbs));
 #endif
     }
 }
@@ -33,8 +38,13 @@ static void task_identification(void *taskParmPtr) {
     static uint32_t sample;
     TickType_t lastWakeTime = xTaskGetTickCount();
     for (;;) {
+
+#ifdef onda_cuadrada
     	uint32_t sample = adcRead(&hadc1);
     	printf ("%d / %d \r\n", ((uint16_t)sample), ((uint16_t)dacValue));
+#else
+    	printf ("%d / %d \r\n", ((uint16_t)sample_2), ((uint16_t)dac_convert));
+#endif
         vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(1000 / sample_freq));
     }
 }
