@@ -49,7 +49,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define STEP
+#define PID
 // Noise signal limits
 #define DAC_REFERENCE_VALUE_HIGH   666  // 1023 = 3.3V, 666 = 2.15V
 #define DAC_REFERENCE_VALUE_LOW    356  // 1023 = 3.3V, 356 = 1.15V
@@ -182,14 +182,15 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 #if defined(PID)
-  xTaskCreate(
+  init_pid();
+  /*xTaskCreate(
      pidControlTask,                 // Function that implements the task.
      (const char *)"pidControlTask", // Text name for the task.
      configMINIMAL_STACK_SIZE*2,     // Stack size in words, not bytes.
      0,                              // Parameter passed into the task.
      tskIDLE_PRIORITY+1,             // Priority at which the task is created.
      0                               // Pointer to the task created in the system
-  );
+  );*/
 #elif defined(ILS)
 	tILS1 = (t_ILSdata*) malloc (sizeof(t_ILSdata));
 	ILS_Init(tILS1, 50, 10, receiveData);

@@ -8,6 +8,6 @@
 #ifndef INC_PID_H_
 #define INC_PID_H_
 
-
+void init_pid(void);
 
 #endif /* INC_PID_H_ */
