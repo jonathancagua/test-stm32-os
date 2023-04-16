@@ -206,6 +206,8 @@ int main(void)
 	);
 #elif defined(STEP)
 	init_ident_step();
+#elif defined(POLE)
+	init_pole();
 #else
 	tIRLS1 = (t_IRLSdata*) pvPortMalloc (sizeof(t_IRLSdata));
 	IRLS_Init(tIRLS1, 10, receiveData);

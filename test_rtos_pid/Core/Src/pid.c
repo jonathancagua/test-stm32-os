@@ -28,7 +28,7 @@ static uint16_t dacValue = 0;
 static uint32_t dac_convert = 0;
 static uint32_t sample_2 = 0;
 static bool enable_pid = true;
-
+float32_t K[] = {-2497, -499998};
 float32_t read_sensor(){
 	float32_t value = 0;
 	sample_2 = adcRead(&hadc1);
@@ -85,6 +85,33 @@ int app_pid(void)
     }
 }
 
+
+void readSystemState(float32_t *x) {
+	static uint32_t sample_x,sample_y;
+	sample_x = adcRead(&hadc1);
+	sample_y = adcRead(&hadc2);
+	x[0] = (float)sample_x / 996.0;
+	x[1] = (float)sample_y / 996.0;
+}
+
+
+int task_pole_place(void) {
+    SystemInit(); // Inicializa el sistema y los periféricos
+
+    while (1) {
+        // Leer los valores de entrada y estado del sistema
+        float32_t x[2];
+        readSystemState(x);
+
+        // Calcular la señal de control utilizando el controlador de retroalimentación de estado
+        float32_t u;
+        arm_dot_prod_f32(K, x, 2, &u);
+
+        // Aplicar la señal de control al sistema
+        write_actuator(u);
+    }
+}
+
 void vTimerCallback(TimerHandle_t xTimer) {
 	if(true == enable_pid){
 		output =0;
@@ -97,9 +124,14 @@ void vTimerCallback(TimerHandle_t xTimer) {
 }
 void init_pid(void) {
     xTaskCreate(app_pid, "task_identification",configMINIMAL_STACK_SIZE*4, NULL, tskIDLE_PRIORITY + 1, NULL);
-    // Crea un temporizador con un tiempo de espera de 5 segundos y una repetición automática
+    // Crea un temporizador con un tiempo de espera de 1 segundo y una repetición automática
     TimerHandle_t xTimer = xTimerCreate("Timer Example", pdMS_TO_TICKS(1000), pdTRUE, NULL, vTimerCallback);
 
     // Inicia el temporizador
     xTimerStart(xTimer, 0);
+}
+
+
+void init_pole(void) {
+    xTaskCreate(task_pole_place, "task_pole",configMINIMAL_STACK_SIZE*4, NULL, tskIDLE_PRIORITY + 1, NULL);
 }

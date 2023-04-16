@@ -9,5 +9,5 @@
 #define INC_PID_H_
 
 void init_pid(void);
-
+void init_pole(void);
 #endif /* INC_PID_H_ */

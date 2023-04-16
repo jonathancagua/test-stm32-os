@@ -10,7 +10,7 @@
 #define sample_freq 1000
 #define tak_freq 5
 #define tak_freq_prbs 100
-#//define onda_cuadrada
+#define onda_cuadrada
 static uint16_t dacValue = 0;
 static uint32_t dac_convert = 0;
 uint32_t sample_2 = 0;
